@@ -1,0 +1,27 @@
+/* =========================================
+   Boss Gallery Page Specific Styles
+   ========================================= */
+
+/* 返回按钮 */
+.back-nav {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.back-btn {
+    background: var(--ink-black);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-family: var(--header-font);
+    border: 2px solid #fff;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--accent-red);
+}

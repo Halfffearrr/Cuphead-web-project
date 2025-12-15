@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Story - Cuphead</title>
+
+    <!-- 引入全局样式 -->
+    <link rel="stylesheet" href="../css/main.css">
+    <!-- 引入本页面特有样式 -->
+    <link rel="stylesheet" href="../css/story.css">
+
+    <!-- 引入复古字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Rye&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 全局特效 -->
+    <div class="overlay-effects">
+        <div class="vignette"></div>
+        <div class="scanlines"></div>
+        <div class="scratches"></div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="index.html" class="back-home">← Home</a>
+
+    <!-- 故事书容器 -->
+    <div class="storybook">
+        <div class="spine"></div>
+
+        <div class="page-left">
+            <h2 id="story-title" class="story-title">Introduction</h2>
+            <div id="text-container" class="typewriter-text typewriter-cursor">
+                <!-- Text injected by JS -->
+            </div>
+        </div>
+
+        <div class="page-right">
+            <div id="image-frame" class="image-frame">
+                <img id="story-image" src="" alt="Story Illustration">
+                <div id="image-caption" class="image-caption"></div>
+            </div>
+        </div>
+
+        <!-- 导航按钮组 -->
+        <div class="nav-controls">
+            <button id="prev-btn" class="nav-btn" onclick="prevPage()">
+                &#8678; Prev
+            </button>
+            <button id="next-btn" class="nav-btn" onclick="nextPage()">
+                Next &#10142;
+            </button>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="../js/story.js"></script>
+</body>
+</html>

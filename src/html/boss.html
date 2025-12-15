@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Debtors - Boss Gallery</title>
+    
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/boss.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Rye&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="film-grain"></div>
+    <div class="vignette"></div>
+
+    <nav class="back-nav">
+        <a href="index.html" class="back-btn">← Back to Menu</a>
+    </nav>
+
+    <main class="boss-container">
+        
+        <aside class="boss-sidebar">
+            <h3 style="text-align:center; font-family:var(--header-font); margin-bottom:15px; border-bottom:2px solid #000;">WANTED</h3>
+            <ul class="boss-list" id="bossListContainer">
+                </ul>
+        </aside>
+
+        <section class="boss-display">
+            <h1 class="boss-name-title" id="displayTitle">Select a Boss</h1>
+
+            <div class="boss-image-frame">
+                <img id="displayImage" src="" alt="Boss Image" style="display:none;">
+            </div>
+
+            <div class="phase-controls">
+                <button class="phase-btn" onclick="changePhase(1)">I</button>
+                <button class="phase-btn" onclick="changePhase(2)">II</button>
+                <button class="phase-btn" onclick="changePhase(3)">III</button>
+            </div>
+            
+            <div class="boss-description" id="displayText">
+                Click on a name from the list to view the contract details...
+            </div>
+        </section>
+
+    </main>
+
+    <script src="../js/boss.js"></script>
+</body>
+</html>

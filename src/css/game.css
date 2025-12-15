@@ -1,0 +1,147 @@
+/* =========================================
+   Game Page Specific Styles (TV Console)
+   ========================================= */
+
+body {
+    /* 剧院暗场背景 */
+    background-color: #222;
+    background-image: radial-gradient(circle, #333 0%, #000 90%);
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 电视机整体容器 */
+.tv-set {
+    position: relative;
+    background-color: #5d4037; /* 木纹底色 */
+    /* CSS 模拟木纹 */
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px);
+    padding: 40px;
+    border-radius: 40px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 30px 60px rgba(0,0,0,0.6);
+    border: 8px solid #3e2723;
+    max-width: 900px;
+    width: 95%;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* 电视机屏幕外框 */
+.screen-bezel {
+    flex: 3;
+    background: #111;
+    padding: 20px;
+    border-radius: 50% 50% 50% 50% / 10% 10% 10% 10%; /* CRT 曲面外形 */
+    box-shadow: inset 0 0 15px rgba(255,255,255,0.1);
+}
+
+/* 屏幕显示区域 */
+.screen-content {
+    width: 100%;
+    aspect-ratio: 4/3; /* 复古比例 */
+    background: #000;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #333;
+}
+
+/* 屏幕扫描线滤镜 */
+.scanlines {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* 右侧控制面板 */
+.controls-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    background: #4e342e;
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px solid rgba(0,0,0,0.3);
+}
+
+/* 旋钮按钮 */
+.knob-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #8d6e63 30%, #3e2723 100%);
+    border: 4px solid #281a16;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #d7ccc8;
+    font-family: var(--header-font);
+    font-size: 0.7rem;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* 旋钮上的指示条 */
+.knob-btn::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    width: 4px;
+    height: 15px;
+    background: #fff;
+    border-radius: 2px;
+}
+
+.knob-btn:active {
+    transform: rotate(15deg); /* 点击时旋转 */
+}
+
+.knob-label {
+    font-family: var(--header-font);
+    color: rgba(255,255,255,0.6);
+    margin-top: -20px;
+    font-size: 0.9rem;
+}
+
+/* 底部返回链接 */
+.bottom-nav {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+.bottom-nav a {
+    color: rgba(255,255,255,0.5);
+    font-family: var(--header-font);
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+.bottom-nav a:hover {
+    color: var(--accent-red);
+    text-decoration: underline wavy;
+}
+
+/* 响应式：手机竖屏调整 */
+@media (max-width: 768px) {
+    .tv-set { flex-direction: column; padding: 20px; }
+    .controls-panel { flex-direction: row; width: 100%; justify-content: center; }
+    .knob-btn { width: 60px; height: 60px; font-size: 0.6rem; }
+}

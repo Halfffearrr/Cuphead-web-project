@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Deal With The Devil - Home</title>
+    
+    <!-- 引入 CSS 样式 -->
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- 引入 Google Fonts (必须在 CSS 加载前或并行加载) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Rye&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 1. 全局特效层 (Film Grain & Vignette) -->
+    <div class="film-grain"></div>
+    <div class="vignette"></div>
+
+    <!-- 2. 头部导航 (Header) -->
+    <header class="site-header">
+        <!-- 使用 .jitter-text 让Logo有动态抖动感 -->
+        <div class="logo jitter-text">Cuphead Web</div>
+        <nav class="mini-nav">
+            <!-- 简单的顶部链接，也可以跳转到底部 -->
+            <a href="https://cupheadgame.com/" target="_blank">Official Site</a>
+        </nav>
+    </header>
+
+    <!-- 3. 核心内容：赌桌场景 (Main Content) -->
+    <main class="gambling-table">
+        <h1 class="table-title jitter-text">Pick A Card, Any Card...</h1>
+        
+        <div class="cards-container">
+            <!-- 左边扑克牌：Story -->
+            <a href="story.html" class="playing-card card-story">
+                <div class="card-icon">📖</div>
+                <div class="card-text">Story</div>
+            </a>
+
+            <!-- 中间扑克牌：Bosses -->
+            <a href="boss.html" class="playing-card card-boss">
+                <div class="card-icon">☠️</div>
+                <div class="card-text">Bosses</div>
+            </a>
+
+            <!-- 右边扑克牌：Game -->
+            <a href="game.html" class="playing-card card-game">
+                <div class="card-icon">🎮</div>
+                <div class="card-text">Game</div>
+            </a>
+        </div>
+    </main>
+
+    <!-- 4. 页脚 (Footer) -->
+    <footer class="site-footer">
+        <p>© 1930 Studio MDHR Tribute Project</p>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">High Class Navigation!</p>
+    </footer>
+
+</body>
+</html>

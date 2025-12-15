@@ -1,0 +1,448 @@
+/* =========================================
+   1. 核心变量与基础设置 (Core Setup)
+   ========================================= */
+   :root {
+    --bg-color: #e3d0a6;       /* 做旧米黄纸张色 */
+    --accent-red: #d9382e;     /* 复古红 */
+    --ink-black: #1a1a1a;      /* 墨水黑 */
+    --felt-green: #2e4d34;     /* 赌桌毡绿色 */
+    --header-font: 'Rye', serif;
+    --body-font: 'Gloria Hallelujah', cursive;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--ink-black);
+    font-family: var(--body-font);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* 模拟纸张纹理背景图 */
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+/* 链接无下划线，继承颜色 */
+a { text-decoration: none; color: inherit; }
+
+/* =========================================
+   2. 全局视觉特效 (Global Effects)
+   ========================================= */
+
+/* 老电影噪点层 - 必须置顶且不阻挡点击 */
+.film-grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.12;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: grainAnim 2s steps(10) infinite;
+}
+
+/* 屏幕暗角 (Vignette) */
+.vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+    background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(26, 26, 26, 0.4) 100%);
+}
+
+@keyframes grainAnim {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    30% { transform: translate(3%, -5%); }
+    50% { transform: translate(-3%, 5%); }
+    70% { transform: translate(5%, 2%); }
+    90% { transform: translate(-2%, 8%); }
+}
+
+/* 通用动画类：鼠标悬停浮动 + 旋转 */
+.hover-anim {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.hover-anim:hover {
+    transform: translateY(-8px) rotate(2deg) scale(1.05);
+}
+
+/* 抖动文字效果 (用于Logo) */
+.jitter-text {
+    display: inline-block;
+    animation: jitter 0.4s infinite steps(2);
+}
+@keyframes jitter {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(1px, 1px) rotate(0.5deg); }
+    50% { transform: translate(-1px, -0.5px) rotate(-0.5deg); }
+    75% { transform: translate(0.5px, -1px) rotate(0.2deg); }
+}
+
+/* =========================================
+   3. 排版组件 (Layout Components)
+   ========================================= */
+
+/* 头部 Header */
+.site-header {
+    background-color: var(--accent-red);
+    color: #fff;
+    padding: 1rem 2rem;
+    border-bottom: 4px solid var(--ink-black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 100;
+}
+
+.logo {
+    font-family: var(--header-font);
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.mini-nav a {
+    margin-left: 1.5rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+.mini-nav a:hover {
+    color: #ffd700;
+    text-decoration: underline wavy;
+}
+
+/* 底部 Footer */
+.site-footer {
+    background-color: var(--ink-black);
+    color: var(--bg-color);
+    text-align: center;
+    padding: 2rem;
+    margin-top: auto; /* Push to bottom */
+    font-family: var(--header-font);
+    border-top: 4px solid var(--accent-red);
+}
+
+/* =========================================
+   4. 扑克牌导航特定样式 (Card Navigation)
+   ========================================= */
+.gambling-table {
+    flex: 1; /* 占据剩余空间 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* 赌桌背景 */
+    background-color: var(--felt-green); 
+    background-image: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.3) 80%);
+    padding: 4rem 2rem;
+    position: relative;
+    border-top: 2px dashed rgba(255,255,255,0.2);
+    border-bottom: 2px dashed rgba(255,255,255,0.2);
+}
+
+.table-title {
+    color: #fff;
+    font-family: var(--header-font);
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    text-shadow: 3px 3px 0 var(--ink-black), 0 0 10px rgba(0,0,0,0.5);
+    transform: rotate(-2deg);
+}
+
+.cards-container {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    perspective: 1000px; /* 3D透视 */
+}
+
+/* 扑克牌样式 */
+.playing-card {
+    width: 220px;
+    height: 320px;
+    background-color: #fffdf5;
+    border-radius: 12px;
+    border: 3px solid var(--ink-black);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性过渡 */
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* 卡片内部装饰框 */
+.playing-card::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid var(--accent-red);
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+/* 角落花色 (使用伪元素模拟) */
+.playing-card::after {
+    content: '♠'; /* 默认黑桃 */
+    position: absolute;
+    top: 15px;
+    left: 18px;
+    font-size: 1.5rem;
+    color: var(--ink-black);
+}
+
+/* 不同卡片的个性化设置 */
+.playing-card.card-story::after { content: '♥'; color: var(--accent-red); } /* 红桃 */
+.playing-card.card-boss::after { content: '♣'; color: var(--ink-black); } /* 梅花 */
+.playing-card.card-game::after { content: '♦'; color: var(--accent-red); } /* 方片 */
+
+/* 卡片文字 */
+.card-text {
+    font-family: var(--header-font);
+    font-size: 2rem;
+    z-index: 2;
+    text-transform: uppercase;
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--ink-black);
+}
+
+/* 交互效果 */
+.playing-card:hover {
+    transform: translateY(-30px) rotateY(10deg) scale(1.1); /* 上浮+微翻转 */
+    box-shadow: 15px 15px 25px rgba(0,0,0,0.5);
+    background-color: #fff;
+    z-index: 10;
+}
+
+.playing-card:hover .card-text {
+    color: var(--accent-red);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .cards-container { gap: 1.5rem; }
+    .playing-card { width: 160px; height: 240px; }
+    .table-title { font-size: 1.8rem; }
+}
+
+/* =========================================
+   5. Boss 页面专用样式 (Boss Page Specific)
+   ========================================= */
+
+/* 页面容器：限制最大宽度，居中 */
+.boss-container {
+    width: 95%;
+    max-width: 1200px;
+    height: 85vh; /* 视口高度的85% */
+    margin: 80px auto 20px;
+    display: flex;
+    gap: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+/* --- 左侧：Boss 列表 (Sidebar) --- */
+.boss-sidebar {
+    flex: 1;
+    background: #fdf5e6;
+    border: 4px solid var(--ink-black);
+    border-radius: 8px;
+    padding: 15px;
+    overflow-y: auto; /* 内容过多时滚动 */
+    box-shadow: -5px 5px 0 rgba(0,0,0,0.2);
+    /* 自定义滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-red) #fdf5e6;
+}
+
+.boss-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.boss-item {
+    background: #fff;
+    border: 2px solid var(--ink-black);
+    padding: 15px;
+    font-family: var(--header-font);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+/* 选中状态 & 悬停状态 */
+.boss-item:hover {
+    background: #ffebee;
+    transform: translateX(5px);
+}
+
+.boss-item.active {
+    background: var(--accent-red);
+    color: #fff;
+    transform: scale(1.02);
+    box-shadow: 3px 3px 0 var(--ink-black);
+}
+
+/* 用伪元素加一个骷髅头图标 */
+.boss-item.active::after {
+    content: '☠';
+    position: absolute;
+    right: 15px;
+    font-size: 1.2rem;
+}
+
+/* --- 右侧：Boss 详情展示 (Main Display) --- */
+.boss-display {
+    flex: 2.5;
+    background: #fff;
+    border: 5px solid var(--ink-black);
+    border-radius: 4px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    /* 纸张纹理 */
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(0,0,0,0.05) 30px);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+}
+
+/* 标题 */
+.boss-name-title {
+    font-family: var(--header-font);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-decoration: underline wavy var(--accent-red);
+    text-align: center;
+}
+
+/* 图片区域 */
+.boss-image-frame {
+    width: 100%;
+    max-width: 500px;
+    height: 350px;
+    border: 4px double var(--ink-black);
+    padding: 10px;
+    margin-bottom: 20px;
+    background: #fff;
+    transform: rotate(-1deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.boss-image-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* 微微的旧照片滤镜 */
+    filter: sepia(0.2) contrast(1.1);
+    transition: opacity 0.3s ease;
+}
+
+/* --- 阶段控制按钮 (Phase Controls) --- */
+.phase-controls {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-top: 2px dashed rgba(0,0,0,0.2);
+    border-bottom: 2px dashed rgba(0,0,0,0.2);
+    width: 100%;
+    justify-content: center;
+}
+
+/* 圆形按钮样式 */
+.phase-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #fdf5e6;
+    border: 3px solid var(--ink-black);
+    font-family: var(--header-font);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+.phase-btn:hover {
+    transform: translateY(-3px);
+    background: #fff;
+}
+
+.phase-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+}
+
+/* 选中阶段的样式 */
+.phase-btn.active {
+    background: var(--accent-red);
+    color: #fff;
+    border-color: #5d100b;
+    transform: rotate(10deg);
+}
+
+/* --- 介绍文字区域 --- */
+.boss-description {
+    font-family: var(--body-font);
+    font-size: 1.3rem;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 800px;
+    min-height: 100px;
+    background: rgba(255,255,255,0.8);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* 响应式调整 */
+@media (max-width: 900px) {
+    .boss-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .boss-sidebar {
+        max-height: 200px;
+    }
+    .boss-image-frame {
+        height: 250px;
+    }
+}

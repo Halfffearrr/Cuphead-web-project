@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Game - Cuphead</title>
+
+    <!-- 引入全局通用样式 -->
+    <link rel="stylesheet" href="../css/main.css">
+    <!-- 本页面特有样式 -->
+    <link rel="stylesheet" href="../css/game.css">
+    
+    <!-- 引入字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Rye&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 全局特效 -->
+    <div class="film-grain"></div>
+    <div class="vignette"></div>
+
+    <!-- 电视机组件 -->
+    <div class="tv-set">
+        
+        <!-- 屏幕部分 -->
+        <div class="screen-bezel">
+            <div class="screen-content" id="screen-area">
+                <div class="scanlines"></div> <!-- CRT 扫描线遮罩 -->
+                <!-- 游戏嵌入 iframe -->
+                <iframe id="game-frame" src="about:blank" title="Cuphead Game"></iframe>
+            </div>
+        </div>
+
+        <!-- 旋钮部分 -->
+        <div class="controls-panel">
+            
+            <!-- 全屏按钮 -->
+            <button class="knob-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                FULL<br>SCREEN
+            </button>
+            <div class="knob-label">Display</div>
+
+            <!-- 静音按钮 -->
+            <button class="knob-btn" onclick="toggleMute(event)" title="Mute Audio">
+                MUTE<br>AUDIO
+            </button>
+            <div class="knob-label">Sound</div>
+
+        </div>
+    </div>
+
+    <!-- 底部返回导航 -->
+    <div class="bottom-nav">
+        <a href="index.html">← Return to Home</a>
+    </div>
+
+    <!-- 加载游戏脚本 -->
+    <script src="../js/game.js"></script>
+</body>
+</html>
