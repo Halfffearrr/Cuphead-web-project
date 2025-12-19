@@ -7,7 +7,7 @@
  * 启用/禁用全屏模式
  * 将游戏屏幕切换到全屏视图
  */
-function toggleFullscreen() {
+export function toggleFullscreen() {
     const screen = document.getElementById('screen-area');
     
     if (!document.fullscreenElement) {
@@ -24,7 +24,7 @@ function toggleFullscreen() {
  * 通过 postMessage 与嵌入的 iframe 游戏进行通信
  * 同时提供可视反馈（按钮旋转动画）
  */
-function toggleMute(event) {
+export function toggleMute(event) {
     const iframe = document.getElementById('game-frame');
     
     // 获取按钮元素（触发事件的元素）
@@ -48,11 +48,22 @@ function toggleMute(event) {
 /**
  * 页面加载时的初始化
  */
-function init() {
-    // 可选：在这里设置事件监听器或初始化其他功能
+export function init() {
+    // 绑定按钮事件
+    const fullscreenBtn = document.querySelector('.knob-btn[title="Fullscreen"]');
+    const muteBtn = document.querySelector('.knob-btn[title="Mute Audio"]');
+    
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+    
+    if (muteBtn) {
+        muteBtn.addEventListener('click', toggleMute);
+    }
+    
     console.log("Game page initialized.");
     
-    // 例如：监听全屏变化
+    // 监听全屏变化
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) {
             console.log("Exited fullscreen mode");
@@ -61,4 +72,12 @@ function init() {
 }
 
 // 在 DOM 加载完成时初始化
-document.addEventListener('DOMContentLoaded', init);
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', init);
+}
+
+// 为了向后兼容，也暴露到 window 对象
+if (typeof window !== 'undefined') {
+    window.toggleFullscreen = toggleFullscreen;
+    window.toggleMute = toggleMute;
+}

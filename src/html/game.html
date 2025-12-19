@@ -29,7 +29,7 @@
             <div class="screen-content" id="screen-area">
                 <div class="scanlines"></div> <!-- CRT 扫描线遮罩 -->
                 <!-- 游戏嵌入 iframe -->
-                <iframe id="game-frame" src="about:blank" title="Cuphead Game"></iframe>
+                <iframe id="game-frame" src="../../webwebweb/index.html" title="Cuphead Game" allowfullscreen></iframe>
             </div>
         </div>
 
@@ -37,13 +37,13 @@
         <div class="controls-panel">
             
             <!-- 全屏按钮 -->
-            <button class="knob-btn" onclick="toggleFullscreen()" title="Fullscreen">
+            <button class="knob-btn" title="Fullscreen">
                 FULL<br>SCREEN
             </button>
             <div class="knob-label">Display</div>
 
             <!-- 静音按钮 -->
-            <button class="knob-btn" onclick="toggleMute(event)" title="Mute Audio">
+            <button class="knob-btn" title="Mute Audio">
                 MUTE<br>AUDIO
             </button>
             <div class="knob-label">Sound</div>
@@ -57,6 +57,6 @@
     </div>
 
     <!-- 加载游戏脚本 -->
-    <script src="../js/game.js"></script>
+    <script type="module" src="../js/game.js"></script>
 </body>
 </html>
