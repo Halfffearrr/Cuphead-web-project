@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuphead - Don't Deal With The Devil</title>
+    
+    <!-- 3D 像素风格样式 -->
+    <link rel="stylesheet" href="../css/shopify-inspired.css">
+    
+    <!-- 像素字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 复古暖色调配色 */
+        :root {
+            --color-bg: #1a1410;
+            --color-bg-warm: #2a1f18;
+            --color-cream: #f5e6c8;
+            --color-sepia: #d4a574;
+            --color-gold: #c9a227;
+            --color-rust: #8b4513;
+            --color-wine: #722f37;
+            --color-burgundy: #4a1c2c;
+            --color-red: #c41e3a;
+            --color-orange: #d2691e;
+            --color-amber: #ffbf00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background: var(--color-bg);
+            color: var(--color-cream);
+            font-family: 'VT323', monospace;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 20px;
+        }
+        
+        /* CRT扫描线效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 10000;
+        }
+        
+        /* 胶片颗粒效果 */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 9999;
+            background-image: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+        }
+        
+        /* 像素化 */
+        img {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        /* 顶部文字导航栏 - 像素风格 */
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            display: flex;
+            gap: 40px;
+            background: rgba(42, 31, 24, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px 40px;
+            border: 4px solid var(--color-sepia);
+            box-shadow: inset 0 0 0 2px var(--color-rust), 0 8px 20px rgba(0, 0, 0, 0.7);
+        }
+        
+        .top-nav a {
+            color: var(--color-sepia);
+            text-decoration: none;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+            padding: 8px 15px;
+            border: 2px solid transparent;
+        }
+        
+        .top-nav a::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: all 0.2s;
+            color: var(--color-gold);
+        }
+        
+        .top-nav a:hover,
+        .top-nav a.active {
+            color: var(--color-cream);
+            background: rgba(201, 162, 39, 0.1);
+            border-color: var(--color-gold);
+        }
+        
+        .top-nav a:hover::before,
+        .top-nav a.active::before {
+            opacity: 1;
+            left: -15px;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* 右侧圆点导航栏 - 像素风格 */
+        .side-nav {
+            position: fixed !important;
+            right: 30px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 99999 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 20px !important;
+        }
+        
+        .nav-dot {
+            width: 16px;
+            height: 16px;
+            background: rgba(212, 165, 116, 0.3);
+            border: 3px solid var(--color-rust);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 99999 !important;
+        }
+        
+        .nav-dot:hover {
+            background: var(--color-sepia);
+            border-color: var(--color-gold);
+            transform: scale(1.2);
+        }
+        
+        .nav-dot.active {
+            background: var(--color-gold);
+            border-color: var(--color-amber);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.6);
+            transform: scale(1.3);
+        }
+        
+        .nav-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            font-size: 16px;
+            color: var(--color-cream);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            background: rgba(42, 31, 24, 0.95);
+            padding: 8px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            border: 2px solid var(--color-sepia);
+        }
+        
+        .nav-dot:hover::after {
+            opacity: 1;
+        }
+        
+        /* 长页面Section */
+        .full-section {
+            min-height: 100vh;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 40px 80px 40px;
+            scroll-margin-top: 100px;
+            overflow: hidden;
+        }
+        
+        /* 3D滑动交互 - Cuphead角色区域 */
+        .cuphead-3d-container {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .cuphead-sprite {
+            width: 150px;
+            height: 150px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 20px rgba(201, 162, 39, 0.6));
+            animation: cupheadBounce 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes cupheadBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+        
+        /* 动作状态指示器 - 像素风格 */
+        .action-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(42, 31, 24, 0.95);
+            padding: 10px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            color: var(--color-gold);
+            border: 3px solid var(--color-sepia);
+            box-shadow: inset 0 0 0 1px var(--color-rust);
+            z-index: 101;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* 滚动进度条 - 暖色调 */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--color-gold), var(--color-amber), var(--color-red));
+            z-index: 99999;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.5);
+        }
+        
+        /* 3D透视容器 */
+        .perspective-container {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        
+        /* 3D卡片翻转效果 */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+        
+        /* Hero Section 像素风格标题 */
+        .hero-3d-scene {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .hero-title-3d {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 400;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--color-gold);
+            text-shadow: 
+                3px 3px 0 var(--color-rust),
+                6px 6px 0 var(--color-bg);
+            animation: textGlow 3s ease-in-out infinite;
+            transform: translateZ(50px);
+            transition: transform 0.5s ease;
+        }
+        
+        @keyframes textGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 20px rgba(201, 162, 39, 0.4)); 
+            }
+            50% { 
+                filter: drop-shadow(0 0 40px rgba(201, 162, 39, 0.8)); 
+            }
+        }
+        
+        /* 滚动时的3D层叠效果 */
+        .scroll-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-out;
+        }
+        
+        .scroll-layer-1 { z-index: 1; }
+        .scroll-layer-2 { z-index: 2; }
+        .scroll-layer-3 { z-index: 3; }
+        
+        /* Cuphead动作状态样式 */
+        .cuphead-action-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 80px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .action-showcase {
+            text-align: center;
+            perspective: 800px;
+            background: rgba(42, 31, 24, 0.5);
+            padding: 20px;
+            border: 3px solid var(--color-rust);
+            transition: all 0.3s;
+        }
+        
+        .action-showcase:hover {
+            border-color: var(--color-gold);
+            background: rgba(42, 31, 24, 0.8);
+            transform: translateY(-5px);
+        }
+        
+        .action-sprite {
+            width: 100px;
+            height: 100px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            margin-bottom: 15px;
+            transition: transform 0.4s ease;
+            filter: drop-shadow(0 0 15px rgba(201, 162, 39, 0.3));
+        }
+        
+        .action-showcase:hover .action-sprite {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 25px rgba(201, 162, 39, 0.6));
+        }
+        
+        .action-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            color: var(--color-sepia);
+            letter-spacing: 2px;
+        }
+        
+        .action-showcase:hover .action-label {
+            color: var(--color-gold);
+        }
+        }
+        
+        .action-label {
+            font-family: 'Rye', serif;
+            font-size: 1rem;
+            color: #d9382e;
+        }
+        
+        /* 横向滚动展示区 */
+        .horizontal-scroll-section {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            scrollbar-width: none;
+        }
+        
+        .horizontal-scroll-section::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scroll-item {
+            flex: 0 0 300px;
+            height: 400px;
+            margin: 20px;
+            scroll-snap-align: center;
+            background: rgba(42, 31, 24, 0.8);
+            border: 4px solid var(--color-rust);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .scroll-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(201, 162, 39, 0.4);
+            border-color: var(--color-gold);
+        }
+        
+        .scroll-item-sprite {
+            width: 150px;
+            height: 150px;
+            image-rendering: pixelated;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(201, 162, 39, 0.3));
+        }
+        
+        .scroll-item-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--color-gold);
+            margin-bottom: 10px;
+        }
+        
+        .scroll-item-desc {
+            color: var(--color-sepia);
+            font-size: 16px;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        /* 3D像素背景 */
+        .pixel-bg-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Canvas 3D场景 */
+        #pixel-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+        
+        /* Section内容 */
+        .section-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        #hero {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f0f 100%);
+        }
+        
+        .hero-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 400;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--color-gold);
+            text-shadow: 
+                3px 3px 0 var(--color-rust),
+                6px 6px 0 var(--color-bg);
+            animation: textGlow 3s ease-in-out infinite;
+        }
+        
+        .hero-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--color-sepia);
+            margin-bottom: 50px;
+        }
+        
+        /* Story Section - 暖色调 */
+        #story {
+            background: linear-gradient(135deg, var(--color-bg-warm) 0%, var(--color-burgundy) 100%);
+        }
+        
+        .story-preview {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .story-book-img {
+            flex: 1;
+            background: rgba(201, 162, 39, 0.1);
+            border: 4px solid var(--color-sepia);
+            padding: 40px;
+            text-align: center;
+            font-size: 4rem;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .story-text {
+            flex: 1;
+        }
+        
+        .story-text h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--color-gold);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .story-text p {
+            line-height: 1.8;
+            color: var(--color-sepia);
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        /* Boss Section - 暖色调 */
+        #boss {
+            background: linear-gradient(135deg, var(--color-burgundy) 0%, var(--color-bg) 100%);
+        }
+        
+        .boss-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .boss-card {
+            background: rgba(42, 31, 24, 0.6);
+            border: 3px solid var(--color-rust);
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .boss-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-red), var(--color-orange), var(--color-amber));
+        }
+        
+        .boss-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--color-gold);
+            box-shadow: 0 20px 40px rgba(201, 162, 39, 0.3);
+        }
+        
+        .boss-card .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .boss-card h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            margin-bottom: 10px;
+            color: var(--color-cream);
+        }
+        
+        /* Game Section - 暖色调 */
+        #game {
+            background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-burgundy) 100%);
+        }
+        
+        .game-preview {
+            background: rgba(42, 31, 24, 0.8);
+            border: 4px solid var(--color-sepia);
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+        
+        .game-preview .icon {
+            font-size: 6rem;
+            margin-bottom: 30px;
+        }
+        
+        .game-preview h2 {
+            font-family: 'Rye', serif;
+            font-size: 3rem;
+            color: #d9382e;
+            margin-bottom: 20px;
+        }
+        
+        /* Apple风格：滚动触发动画 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Apple风格：计数器动画 */
+        .counter-number {
+            font-family: 'Rye', serif;
+            font-size: 3rem;
+            color: #d9382e;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        /* Apple风格：粘性滚动效果 */
+        .sticky-section {
+            position: relative;
+        }
+        
+        .sticky-bg {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        /* 特性卡片网格 - Apple风格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+            perspective: 1000px;
+        }
+        
+        .feature-item {
+            background: rgba(26, 26, 26, 0.6);
+            border: 2px solid rgba(217, 56, 46, 0.2);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateZ(0);
+            opacity: 0;
+            animation: slideInUp 0.8s ease forwards;
+        }
+        
+        .feature-item:nth-child(1) { animation-delay: 0.2s; }
+        .feature-item:nth-child(2) { animation-delay: 0.4s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        
+        .feature-item:hover {
+            transform: translateY(-10px);
+            border-color: #d9382e;
+            background: rgba(217, 56, 46, 0.1);
+            box-shadow: 0 20px 40px rgba(217, 56, 46, 0.2);
+        }
+        
+        .feature-item .number {
+            font-family: 'Rye', serif;
+            font-size: 2.5rem;
+            color: #d9382e;
+            margin-bottom: 15px;
+        }
+        
+        .feature-item h3 {
+            font-family: 'Rye', serif;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .feature-item p {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+        
+        /* Apple风格：渐进式加载 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* 粘性导航效果 */
+        .top-nav.sticky {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(217, 56, 46, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 按钮样式 - 像素风格 */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--color-gold);
+            color: var(--color-bg);
+            text-decoration: none;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            border: none;
+            position: relative;
+            cursor: pointer;
+            /* 像素边框效果 */
+            clip-path: polygon(
+                0 4px, 4px 4px, 4px 0,
+                calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+                100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+                4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+            );
+            box-shadow: 0 5px 15px rgba(201, 162, 39, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--color-rust), 0 5px 20px rgba(201, 162, 39, 0.6);
+        }
+        
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+        
+        /* 动画 */
+        @keyframes textGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(255, 68, 102, 0.4)); }
+            50% { filter: drop-shadow(0 0 50px rgba(255, 68, 102, 0.6)); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .top-nav {
+                top: 20px;
+                padding: 12px 30px;
+                gap: 25px;
+            }
+            .top-nav-link {
+                font-size: 14px;
+            }
+            .side-nav { display: none; }
+            .story-preview { flex-direction: column; }
+            .boss-grid { grid-template-columns: 1fr; }
+            .full-section { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 滚动进度条 -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- 固定的Cuphead角色（跟随滚动改变动作） -->
+    <div class="cuphead-3d-container" id="cupheadContainer">
+        <img class="cuphead-sprite" id="cupheadSprite" 
+             src="../../Player/Idle/cuphead_idle_0001.png" 
+             alt="Cuphead">
+    </div>
+    
+    <!-- 动作状态指示器 -->
+    <div class="action-indicator" id="actionIndicator">IDLE</div>
+
+    <!-- 3D像素背景 Canvas -->
+    <div class="pixel-bg-3d">
+        <canvas id="pixel-canvas"></canvas>
+    </div>
+
+    <!-- 顶部文字导航栏 -->
+    <nav class="top-nav">
+        <a class="top-nav-link active" onclick="scrollToSection('hero')">HOME</a>
+        <a class="top-nav-link" onclick="scrollToSection('story')">STORY</a>
+        <a class="top-nav-link" onclick="scrollToSection('boss')">BOSSES</a>
+        <a class="top-nav-link" onclick="scrollToSection('game')">PLAY</a>
+    </nav>
+    
+    <!-- 右侧圆点导航 -->
+    <nav class="side-nav">
+        <div class="nav-dot active" data-label="首页" onclick="scrollToSection('hero')"></div>
+        <div class="nav-dot" data-label="故事" onclick="scrollToSection('story')"></div>
+        <div class="nav-dot" data-label="Boss" onclick="scrollToSection('boss')"></div>
+        <div class="nav-dot" data-label="游戏" onclick="scrollToSection('game')"></div>
+    </nav>
+
+    <!-- Section 1: Hero 首屏 -->
+    <section id="hero" class="full-section">
+        <div class="section-content perspective-container">
+            <div class="hero-3d-scene">
+                <h1 class="hero-title-3d" id="heroTitle">
+                    DON'T DEAL WITH<br>THE DEVIL
+                </h1>
+                <p class="hero-subtitle" data-parallax="0.3">
+                    体验1930年代经典卡通风格的弹幕射击游戏
+                </p>
+                
+                <!-- Cuphead 动作展示 -->
+                <div class="cuphead-action-container">
+                    <div class="action-showcase scroll-reveal" data-action="idle">
+                        <img class="action-sprite" src="../../Player/Idle/cuphead_idle_0001.png" alt="Idle">
+                        <div class="action-label">IDLE</div>
+                    </div>
+                    <div class="action-showcase scroll-reveal" data-action="run">
+                        <img class="action-sprite" src="../../Player/Run/Normal/cuphead_run_0001.png" alt="Run">
+                        <div class="action-label">RUN</div>
+                    </div>
+                    <div class="action-showcase scroll-reveal" data-action="jump">
+                        <img class="action-sprite" src="../../Player/Jump/Cuphead/cuphead_jump_0001.png" alt="Jump">
+                        <div class="action-label">JUMP</div>
+                    </div>
+                    <div class="action-showcase scroll-reveal" data-action="dash">
+                        <img class="action-sprite" src="../../Player/Dash/Ground/cuphead_dash_0001.png" alt="Dash">
+                        <div class="action-label">DASH</div>
+                    </div>
+                    <div class="action-showcase scroll-reveal" data-action="shoot">
+                        <img class="action-sprite" src="../../Player/Shoot/Straight/cuphead_shoot_straight_0001.png" alt="Shoot">
+                        <div class="action-label">SHOOT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Story 故事 -->
+    <section id="story" class="full-section">
+        <div class="section-content">
+            <div class="story-preview" data-parallax="0.15">
+                <div class="story-book-img" style="position: relative;">
+                    <!-- Cuphead 角色动画 -->
+                    <img id="storyCuphead" 
+                         src="../../Player/Run/Normal/cuphead_run_0001.png" 
+                         alt="Cuphead Running"
+                         style="width: 200px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 30px rgba(217, 56, 46, 0.5));">
+                </div>
+                <div class="story-text">
+                    <h2>The Devil's Deal</h2>
+                    <p>
+                        在墨池岛上，Cuphead和Mugman在恶魔的赌场里输掉了一切。
+                        为了拯救自己的灵魂，他们必须为恶魔收集债务...
+                    </p>
+                    <a href="story.html" class="btn">📖 阅读完整故事</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Boss Boss画廊 -->
+    <section id="boss" class="full-section">
+        <div class="section-content">
+            <h2 style="font-family: 'Rye', serif; font-size: 3rem; text-align: center; color: #d9382e; margin-bottom: 20px;">
+                The Debtors
+            </h2>
+            <p style="text-align: center; color: #a0a0a0; margin-bottom: 50px;">
+                挑战欠下债务的Boss们，收集他们的契约
+            </p>
+            
+            <div class="boss-grid" data-parallax="0.1">
+                <div class="boss-card">
+                    <div class="icon">☠️</div>
+                    <h3>Root Pack</h3>
+                    <p style="color: #a0a0a0; font-size: 0.9rem;">蔬菜三人组</p>
+                </div>
+                <div class="boss-card">
+                    <div class="icon">🎪</div>
+                    <h3>Goopy Le Grande</h3>
+                    <p style="color: #a0a0a0; font-size: 0.9rem;">蓝色史莱姆</p>
+                </div>
+                <div class="boss-card">
+                    <div class="icon">🦀</div>
+                    <h3>Cagney Carnation</h3>
+                    <p style="color: #a0a0a0; font-size: 0.9rem;">暴躁康乃馨</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="boss.html" class="btn">🎯 查看完整画廊</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Game 游戏 -->
+    <section id="game" class="full-section">
+        <div class="section-content">
+            <div class="game-preview scroll-reveal" data-parallax="0.2">
+                <!-- Cuphead 射击动画 -->
+                <img id="gameCuphead" 
+                     src="../../Player/Shoot/Straight/cuphead_shoot_straight_0001.png" 
+                     alt="Cuphead Shooting"
+                     style="width: 180px; height: auto; image-rendering: pixelated; margin-bottom: 20px; filter: drop-shadow(0 0 30px rgba(255, 68, 102, 0.6));">
+                <h2>Start Your Adventure</h2>
+                <p style="color: #a0a0a0; margin: 20px 0 40px;">
+                    准备好面对挑战了吗？点击按钮开始游戏
+                </p>
+                <a href="game.html" class="btn">🕹️ 开始游戏</a>
+            </div>
+            
+            <!-- Apple风格：特性展示网格 -->
+            <div class="features-grid">
+                <div class="feature-item scroll-reveal">
+                    <div class="number counter" data-target="19">0</div>
+                    <h3>Boss 战斗</h3>
+                    <p>挑战19个独特的Boss，每个都有其独特的攻击模式和动画</p>
+                </div>
+                <div class="feature-item scroll-reveal">
+                    <div class="number">1930s</div>
+                    <h3>手绘风格</h3>
+                    <p>致敬1930年代经典卡通，每一帧都是艺术精品</p>
+                </div>
+                <div class="feature-item scroll-reveal">
+                    <div class="number counter" data-target="4">0</div>
+                    <h3>难度等级</h3>
+                    <p>从简单到高难度，满足不同玩家的挑战需求</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D像素背景脚本 + 滑动交互 -->
+    <script>
+        // =========================================
+        // Apple风格：滚动交互特效
+        // =========================================
+        
+        // Cuphead 动画帧序列
+        const cupheadAnimations = {
+            idle: {
+                path: '../../Player/Idle/',
+                prefix: 'cuphead_idle_',
+                frames: 5,
+                speed: 100
+            },
+            run: {
+                path: '../../Player/Run/Normal/',
+                prefix: 'cuphead_run_',
+                frames: 16,
+                speed: 50
+            },
+            jump: {
+                path: '../../Player/Jump/Cuphead/',
+                prefix: 'cuphead_jump_',
+                frames: 8,
+                speed: 80
+            },
+            dash: {
+                path: '../../Player/Dash/Ground/',
+                prefix: 'cuphead_dash_',
+                frames: 6,
+                speed: 60
+            },
+            shoot: {
+                path: '../../Player/Shoot/Straight/',
+                prefix: 'cuphead_shoot_straight_',
+                frames: 3,
+                speed: 80
+            }
+        };
+        
+        let currentAnimation = 'idle';
+        let currentFrame = 1;
+        let animationInterval = null;
+        
+        const cupheadSprite = document.getElementById('cupheadSprite');
+        const cupheadContainer = document.getElementById('cupheadContainer');
+        const scrollProgress = document.getElementById('scrollProgress');
+        const actionIndicator = document.getElementById('actionIndicator');
+        
+        // 切换动画
+        function switchAnimation(animName) {
+            if (currentAnimation === animName) return;
+            currentAnimation = animName;
+            currentFrame = 1;
+            
+            // 更新动作指示器
+            if (actionIndicator) {
+                actionIndicator.textContent = animName.toUpperCase();
+            }
+            
+            if (animationInterval) clearInterval(animationInterval);
+            
+            const anim = cupheadAnimations[animName];
+            animationInterval = setInterval(() => {
+                const frameNum = String(currentFrame).padStart(4, '0');
+                cupheadSprite.src = `${anim.path}${anim.prefix}${frameNum}.png`;
+                currentFrame = (currentFrame % anim.frames) + 1;
+            }, anim.speed);
+        }
+        
+        // 根据滚动位置切换动画
+        function updateCupheadAnimation() {
+            const scrollY = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = scrollY / maxScroll;
+            
+            // 更新进度条
+            scrollProgress.style.width = (scrollPercent * 100) + '%';
+            
+            // 根据滚动位置切换动画
+            if (scrollPercent < 0.1) {
+                switchAnimation('idle');
+                cupheadContainer.style.transform = 'translateX(-50%)';
+            } else if (scrollPercent < 0.4) {
+                switchAnimation('run');
+                // 跑动时Cuphead跟随滚动移动
+                const moveX = (scrollPercent - 0.1) * 200;
+                cupheadContainer.style.transform = `translateX(calc(-50% + ${moveX}px))`;
+            } else if (scrollPercent < 0.6) {
+                switchAnimation('jump');
+                cupheadContainer.style.transform = 'translateX(-50%) translateY(-30px)';
+            } else if (scrollPercent < 0.8) {
+                switchAnimation('dash');
+                const dashX = (scrollPercent - 0.6) * 300;
+                cupheadContainer.style.transform = `translateX(calc(-50% + ${dashX}px)) scaleX(-1)`;
+            } else {
+                switchAnimation('shoot');
+                cupheadContainer.style.transform = 'translateX(-50%)';
+            }
+        }
+        
+        // 3D标题跟随鼠标
+        const heroTitle = document.getElementById('heroTitle');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            if (heroTitle) {
+                heroTitle.style.transform = `translateZ(50px) rotateY(${x}deg) rotateX(${-y}deg)`;
+            }
+        });
+        
+        // 动作卡片动画预览
+        const actionShowcases = document.querySelectorAll('.action-showcase');
+        actionShowcases.forEach(showcase => {
+            const action = showcase.dataset.action;
+            const sprite = showcase.querySelector('.action-sprite');
+            let interval = null;
+            let frame = 1;
+            
+            showcase.addEventListener('mouseenter', () => {
+                const anim = cupheadAnimations[action];
+                if (!anim) return;
+                
+                interval = setInterval(() => {
+                    const frameNum = String(frame).padStart(4, '0');
+                    sprite.src = `${anim.path}${anim.prefix}${frameNum}.png`;
+                    frame = (frame % anim.frames) + 1;
+                }, anim.speed);
+            });
+            
+            showcase.addEventListener('mouseleave', () => {
+                if (interval) {
+                    clearInterval(interval);
+                    frame = 1;
+                    const anim = cupheadAnimations[action];
+                    sprite.src = `${anim.path}${anim.prefix}0001.png`;
+                }
+            });
+        });
+        
+        // 1. 滚动时的元素显示动画
+        function observeElements() {
+            const revealElements = document.querySelectorAll('.scroll-reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            });
+            
+            revealElements.forEach(el => observer.observe(el));
+        }
+        
+        // 2. 数字计数器动画（滚动时触发）
+        function setupCounterAnimation() {
+            const counters = document.querySelectorAll('.counter');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                        const target = parseInt(entry.target.getAttribute('data-target'));
+                        countUp(entry.target, target);
+                        entry.target.classList.add('counted');
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(counter => observer.observe(counter));
+        }
+        
+        function countUp(element, target) {
+            let current = 0;
+            const increment = target / 30; // 30帧完成计数
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 30);
+        }
+        
+        // 3. 导航栏粘性效果（向下滚动时增强背景）
+        function setupStickyNav() {
+            const topNav = document.querySelector('.top-nav');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    topNav.classList.add('sticky');
+                } else {
+                    topNav.classList.remove('sticky');
+                }
+            });
+        }
+        
+        // 4. 鼠标跟随光效（卡片悬浮时）
+        function setupMouseGlow() {
+            const featureItems = document.querySelectorAll('.feature-item');
+            
+            featureItems.forEach(item => {
+                item.addEventListener('mousemove', (e) => {
+                    const rect = item.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    item.style.setProperty('--mouse-x', x + 'px');
+                    item.style.setProperty('--mouse-y', y + 'px');
+                });
+            });
+        }
+        
+        // 初始化所有Apple风格特效
+        window.addEventListener('load', () => {
+            observeElements();
+            setupCounterAnimation();
+            setupStickyNav();
+            setupMouseGlow();
+            
+            // 初始化Cuphead动画
+            switchAnimation('idle');
+            
+            // Story区域的Cuphead跑步动画
+            const storyCuphead = document.getElementById('storyCuphead');
+            if (storyCuphead) {
+                let storyFrame = 1;
+                setInterval(() => {
+                    const frameNum = String(storyFrame).padStart(4, '0');
+                    storyCuphead.src = `../../Player/Run/Normal/cuphead_run_${frameNum}.png`;
+                    storyFrame = (storyFrame % 16) + 1;
+                }, 50);
+            }
+            
+            // Game区域的Cuphead射击动画
+            const gameCuphead = document.getElementById('gameCuphead');
+            if (gameCuphead) {
+                let gameFrame = 1;
+                setInterval(() => {
+                    const frameNum = String(gameFrame).padStart(4, '0');
+                    gameCuphead.src = `../../Player/Shoot/Straight/cuphead_shoot_straight_${frameNum}.png`;
+                    gameFrame = (gameFrame % 3) + 1;
+                }, 80);
+            }
+        });
+        
+        // =========================================
+        // 3D 像素背景动画（使用Canvas）
+        // =========================================
+        const canvas = document.getElementById('pixel-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置Canvas尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 3D像素立方体对象
+        class PixelCube {
+            constructor(x, y, z, size, color) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.size = size;
+                this.color = color;
+                this.speed = Math.random() * 0.5 + 0.2;
+            }
+            
+            update() {
+                this.z -= this.speed;
+                if (this.z < -500) {
+                    this.z = 1000;
+                }
+            }
+            
+            draw() {
+                const scale = 500 / (500 + this.z);
+                const x2d = (this.x * scale) + canvas.width / 2;
+                const y2d = (this.y * scale) + canvas.height / 2;
+                const size2d = this.size * scale;
+                
+                if (size2d < 0.5) return;
+                
+                // 绘制像素化立方体
+                ctx.fillStyle = this.color;
+                ctx.fillRect(x2d, y2d, size2d, size2d);
+                
+                // 3D效果：绘制阴影面
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(x2d, y2d + size2d, size2d, size2d * 0.3);
+            }
+        }
+        
+        // 创建立方体数组
+        const cubes = [];
+        const colors = ['#d9382e', '#ff4466', '#c41e3a', '#2d2d2d', '#1a1a1a'];
+        
+        for (let i = 0; i < 50; i++) {
+            cubes.push(new PixelCube(
+                Math.random() * 1000 - 500,
+                Math.random() * 1000 - 500,
+                Math.random() * 1000,
+                Math.random() * 20 + 10,
+                colors[Math.floor(Math.random() * colors.length)]
+            ));
+        }
+        
+        // 添加赌场元素（扑克牌、骰子、金币）
+        const casinoElements = [
+            { char: '🃏', x: -300, y: -200, z: 500 },
+            { char: '🎲', x: 200, y: -150, z: 600 },
+            { char: '🪙', x: -100, y: 100, z: 700 },
+            { char: '♠️', x: 300, y: 50, z: 800 },
+            { char: '♥️', x: -200, y: 200, z: 550 },
+        ];
+        
+        // 动画循环
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制立方体
+            cubes.forEach(cube => {
+                cube.update();
+                cube.draw();
+            });
+            
+            // 绘制赌场元素
+            casinoElements.forEach(elem => {
+                elem.z -= 0.3;
+                if (elem.z < -500) elem.z = 1000;
+                
+                const scale = 500 / (500 + elem.z);
+                const x2d = (elem.x * scale) + canvas.width / 2;
+                const y2d = (elem.y * scale) + canvas.height / 2;
+                const size = 40 * scale;
+                
+                ctx.font = `${size}px Arial`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * scale})`;
+                ctx.fillText(elem.char, x2d, y2d);
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // =========================================
+        // 滑动视差效果（Parallax Scrolling）
+        // =========================================
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            
+            document.querySelectorAll('[data-parallax]').forEach(elem => {
+                const speed = parseFloat(elem.getAttribute('data-parallax'));
+                const yPos = -(scrolled * speed);
+                elem.style.transform = `translateY(${yPos}px)`;
+            });
+            
+            // 更新导航点状态
+            updateNavDots();
+            
+            // 更新Cuphead动画
+            updateCupheadAnimation();
+        });
+        
+        // =========================================
+        // 导航索引栏功能
+        // =========================================
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const offset = section.offsetTop - 100; // 减去导航栏高度留出空间
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+        }
+        
+        function updateNavDots() {
+            const sections = ['hero', 'story', 'boss', 'game'];
+            const dots = document.querySelectorAll('.nav-dot');
+            const links = document.querySelectorAll('.top-nav-link');
+            
+            sections.forEach((sectionId, index) => {
+                const section = document.getElementById(sectionId);
+                const sectionTop = section.offsetTop;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                const windowCenter = window.scrollY + window.innerHeight / 3;
+                
+                // 如果窗口顶部在section范围内，则激活该section
+                if (window.scrollY >= sectionTop - 100 && window.scrollY < sectionBottom - 100) {
+                    dots[index].classList.add('active');
+                    links[index].classList.add('active');
+                } else {
+                    dots[index].classList.remove('active');
+                    links[index].classList.remove('active');
+                }
+            });
+        }
+        
+        // 初始化导航点
+        updateNavDots();
+    </script>
+
+</body>
+</html>

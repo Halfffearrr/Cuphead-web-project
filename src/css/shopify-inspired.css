@@ -1,0 +1,399 @@
+/* =========================================
+   Shopify-Inspired Cuphead Design System
+   基于 Shopify Editions Winter '26 风格
+   ========================================= */
+
+:root {
+  /* === 主色调 === */
+  --primary-dark: #0a0a0a;
+  --primary-red: #d9382e;
+  --accent-crimson: #c41e3a;
+  --neon-red: #ff4466;
+  
+  /* === 辅助色 === */
+  --card-dark: #1a1a1a;
+  --card-border: #2d2d2d;
+  --glass-white: rgba(255, 255, 255, 0.05);
+  --glass-red: rgba(217, 56, 46, 0.1);
+  
+  /* === 文字色 === */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --text-glow: #ff6b82;
+  
+  /* === 特效色 === */
+  --glow-red: rgba(255, 68, 102, 0.4);
+  --shadow-deep: rgba(0, 0, 0, 0.8);
+  --gradient-hero: linear-gradient(135deg, #0a0a0a 0%, #1a0f0f 100%);
+  
+  /* === 间距系统 (8px base) === */
+  --space-xs: 0.5rem;   /* 8px */
+  --space-sm: 1rem;     /* 16px */
+  --space-md: 1.5rem;   /* 24px */
+  --space-lg: 2rem;     /* 32px */
+  --space-xl: 3rem;     /* 48px */
+  --space-2xl: 4rem;    /* 64px */
+  
+  /* === 字体系统 === */
+  --font-heading: 'Rye', serif;
+  --font-body: 'Gloria Hallelujah', cursive;
+  --font-modern: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* =========================================
+   全局重置 - Shopify Style
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--primary-dark);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+  line-height: 1.6;
+  /* 现代化平滑滚动 */
+  scroll-behavior: smooth;
+}
+
+/* =========================================
+   Hero Section - 首屏设计
+   ========================================= */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-2xl) var(--space-md);
+  background: var(--gradient-hero);
+  overflow: hidden;
+}
+
+/* 背景网格效果（Shopify风格） */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 背景动画粒子层 */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* 主要内容区 */
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  text-align: center;
+  animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* 超大标题 */
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 8vw, 7.5rem); /* 响应式 48px - 120px */
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-lg);
+  
+  /* Shopify风格文字效果 */
+  background: linear-gradient(135deg, 
+    var(--text-primary) 0%, 
+    var(--neon-red) 50%, 
+    var(--primary-red) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* 文字描边 + 阴影 */
+  filter: drop-shadow(0 0 30px var(--glow-red));
+  
+  /* 打字机动画 */
+  animation: 
+    fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) backwards,
+    textGlow 3s ease-in-out infinite;
+}
+
+/* 副标题 */
+.hero-subtitle {
+  font-family: var(--font-modern);
+  font-size: clamp(1rem, 2vw, 1.5rem); /* 16px - 24px */
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xl);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* =========================================
+   按钮系统 - Shopify Inspired
+   ========================================= */
+
+/* 按钮容器 */
+.hero-buttons {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2xl);
+  animation: fadeInUp 1.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* 基础按钮样式 */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 1rem 2.5rem;
+  font-family: var(--font-modern);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 9999px; /* 完全圆角 */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 主按钮 - 红色渐变 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-red), var(--accent-crimson));
+  color: var(--text-primary);
+  box-shadow: 
+    0 4px 16px rgba(217, 56, 46, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--neon-red), var(--primary-red));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(217, 56, 46, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* 次要按钮 - 玻璃态 */
+.btn-secondary {
+  background: var(--glass-white);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-red);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* 按钮内文字层（确保在伪元素之上） */
+.btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================
+   特色卡片 - Glass Morphism
+   ========================================= */
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1200px;
+  animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.feature-card {
+  position: relative;
+  padding: var(--space-xl);
+  background: rgba(26, 26, 26, 0.6);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* 卡片悬浮光效 */
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    var(--glass-red) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary-red);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(217, 56, 46, 0.2);
+}
+
+/* 卡片图标容器 */
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: var(--glass-red);
+  border: 2px solid var(--card-border);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.feature-card:hover .feature-icon {
+  background: linear-gradient(135deg, var(--primary-red), var(--accent-crimson));
+  border-color: var(--neon-red);
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* 卡片标题 */
+.feature-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+}
+
+/* 卡片描述 */
+.feature-description {
+  font-family: var(--font-modern);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================
+   动画定义
+   ========================================= */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 30px var(--glow-red));
+  }
+  50% {
+    filter: drop-shadow(0 0 50px rgba(255, 68, 102, 0.6));
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* =========================================
+   响应式适配
+   ========================================= */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: var(--space-xl) var(--space-md);
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .feature-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   Tailwind CSS 兼容类（如果需要）
+   ========================================= */
+.glass-effect {
+  background: rgba(26, 26, 26, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+}
+
+.glow-text {
+  filter: drop-shadow(0 0 30px var(--glow-red));
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}

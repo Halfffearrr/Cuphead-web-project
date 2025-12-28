@@ -20,7 +20,7 @@ cd Cuphead-web-project
 npm install
 ```
 
-3. **启动开发服务器**
+3. **启动开发服务器（可选）**
 
 ```bash
 npm run dev
@@ -28,7 +28,7 @@ npm run dev
 
 4. **在浏览器中访问**
 
-打开 http://localhost:3000 即可查看项目
+- 直接双击打开 `src/html/index.html` 即可浏览（首页、故事、Boss 页面）
 
 ### 构建生产版本
 
