@@ -29,7 +29,7 @@ describe('Page Integration Tests', () => {
       
       expect(screenArea).toBeTruthy();
       expect(iframe).toBeTruthy();
-      expect(iframe.src).toContain('webwebweb/index.html');
+      expect(iframe.src).toContain('game/index.html');
     });
 
     it('should have scanlines effect', () => {

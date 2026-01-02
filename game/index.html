@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | Cuphead</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">Cuphead</div>
+      </div>
+    </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/webwebweb.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/webwebweb.data",
+        frameworkUrl: buildUrl + "/webwebweb.framework.js",
+        codeUrl: buildUrl + "/webwebweb.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "Cuphead",
+        productVersion: "1.0",
+        showBanner: unityShowBanner,
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      // 存储 Unity 实例供外部调用
+      var gameInstance = null;
+      var isMuted = false;
+      var audioContext = null;
+      var gainNode = null;
+
+      // 尝试控制音频上下文
+      function setupAudioControl() {
+        try {
+          // 尝试获取或创建 AudioContext
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          gainNode = audioContext.createGain();
+          gainNode.connect(audioContext.destination);
+        } catch (e) {
+          console.log('AudioContext not available');
+        }
+      }
+
+      // 监听来自父页面的消息
+      window.addEventListener('message', function(event) {
+        var data = event.data || {};
+        switch (data.type) {
+          case 'TOGGLE_MUTE':
+            isMuted = data.muted;
+            // 方法1: 尝试通过 Unity SendMessage（如果 Unity 有对应接收方法）
+            if (gameInstance) {
+              try {
+                gameInstance.SendMessage('AudioManager', 'SetMute', isMuted ? 1 : 0);
+              } catch (e) {
+                console.log('Unity AudioManager not found, using fallback');
+              }
+            }
+            // 方法2: 控制所有 audio/video 元素
+            document.querySelectorAll('audio, video').forEach(function(el) {
+              el.muted = isMuted;
+            });
+            // 方法3: 如果有 gainNode 控制
+            if (gainNode) {
+              gainNode.gain.value = isMuted ? 0 : 1;
+            }
+            // 回复父页面
+            if (window.parent !== window) {
+              window.parent.postMessage({ type: 'MUTE_CHANGED', muted: isMuted }, '*');
+            }
+            break;
+          case 'PAUSE':
+            if (gameInstance) {
+              try { gameInstance.SendMessage('GameManager', 'Pause'); } catch(e) {}
+            }
+            break;
+          case 'RESUME':
+            if (gameInstance) {
+              try { gameInstance.SendMessage('GameManager', 'Resume'); } catch(e) {}
+            }
+            break;
+        }
+      });
+
+      setupAudioControl();
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+          // 发送加载进度给父页面
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_PROGRESS', progress: progress }, '*');
+          }
+        }).then((unityInstance) => {
+          gameInstance = unityInstance;
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          document.querySelector("#unity-fullscreen-button").onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+          
+          // 通知父页面游戏已加载
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_LOADED' }, '*');
+          }
+
+        }).catch((message) => {
+          alert(message);
+          // 通知父页面加载失败
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_ERROR', error: message }, '*');
+          }
+        });
+      };
+
+      document.body.appendChild(script);
+
+    </script>
+  </body>
+</html>

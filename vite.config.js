@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-  // 项目根目录
-  root: 'src/html',
+  // 使用 Vue 插件
+  plugins: [vue()],
+  
+  // 项目根目录 - Vue 单页应用
+  root: '.',
   
   // 公共资源目录
   publicDir: resolve(__dirname, 'public'),
@@ -11,30 +15,24 @@ export default defineConfig({
   // 开发服务器配置
   server: {
     port: 3000,
-    open: true, // 自动打开浏览器
+    open: true,
     cors: true,
   },
   
   // 构建配置
   build: {
-    outDir: resolve(__dirname, 'dist'),
+    outDir: 'dist',
     emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'src/html/index.html'),
-        game: resolve(__dirname, 'src/html/game.html'),
-        story: resolve(__dirname, 'src/html/story.html'),
-        boss: resolve(__dirname, 'src/html/boss.html'),
-      },
-    },
   },
   
   // 路径解析
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@css': resolve(__dirname, 'src/css'),
-      '@js': resolve(__dirname, 'src/js'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@views': resolve(__dirname, 'src/views'),
+      '@hooks': resolve(__dirname, 'src/hooks'),
+      '@utils': resolve(__dirname, 'src/utils'),
       '@assets': resolve(__dirname, 'src/assets'),
     },
   },

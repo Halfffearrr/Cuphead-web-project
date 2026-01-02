@@ -1,0 +1,145 @@
+/**
+ * Global Styles - 全局基础样式
+ */
+
+/* ========== Reset ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--body-font);
+  line-height: 1.6;
+  color: var(--ink-black);
+  background-color: var(--bg-color);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ========== 链接 ========== */
+a {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ========== 图片 ========== */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 像素化渲染（用于复古像素图） */
+img.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ========== 按钮重置 ========== */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ========== 列表 ========== */
+ul, ol {
+  list-style: none;
+}
+
+/* ========== 表单元素 ========== */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  outline: none;
+}
+
+/* ========== 排版 ========== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--header-font);
+  font-weight: normal;
+  line-height: 1.3;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+/* ========== 选中文本样式 ========== */
+::selection {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+/* ========== 滚动条样式 ========== */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-warm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rust);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rust) var(--color-bg-warm);
+}
+
+/* ========== 工具类 ========== */
+
+/* 可视隐藏（屏幕阅读器可访问） */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 禁止选择文本 */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 文本截断 */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
