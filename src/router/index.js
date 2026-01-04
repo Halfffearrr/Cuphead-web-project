@@ -30,6 +30,13 @@ const routes = [
     component: () => import('@/views/GameContainer.vue'),
     meta: { title: 'Play Game - Cuphead' }
   },
+  // 🗺️ 地图页面（成员1 临时添加，成员5 可调整）
+  {
+    path: '/map',
+    name: 'Map',
+    component: () => import('@/views/MapView.vue'),
+    meta: { title: 'Inkwell Isle - Map' }
+  },
   // 404 页面
   {
     path: '/:pathMatch(.*)*',
