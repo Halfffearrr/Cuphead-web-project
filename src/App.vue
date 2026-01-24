@@ -1,15 +1,19 @@
 <script setup>
 /**
  * App.vue - 根组件
- * 包含全局特效层和路由视图
+ * 包含全局特效层、音频控制和路由视图
  */
 import RetroOverlay from '@/components/RetroOverlay.vue';
+import AudioControl from '@/components/AudioControl.vue';
 </script>
 
 <template>
   <div id="cuphead-app">
     <!-- 全局复古特效层 -->
     <RetroOverlay />
+    
+    <!-- 音频控制 -->
+    <AudioControl />
     
     <!-- 路由视图 -->
     <RouterView v-slot="{ Component }">

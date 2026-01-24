@@ -1,507 +1,494 @@
 <template>
-  <div class="map-view">
-    <!-- 复古效果叠加层 -->
+  <div 
+    class="map-view-container" 
+    @mousedown="startDrag" 
+    @touchstart="startDrag"
+    @mousemove="onDrag"
+    @touchmove="onDrag"
+    @mouseup="stopDrag"
+    @mouseleave="stopDrag"
+    @touchend="stopDrag"
+  >
+    <!-- 复古滤镜层 (固定在屏幕上) -->
     <div class="retro-overlay">
       <div class="film-grain"></div>
       <div class="vignette"></div>
       <div class="scanlines"></div>
     </div>
 
-    <div class="map-container">
-      <!-- 多层视差背景：远景 → 中景 → 近景 -->
-      <div
-        v-for="(layer, idx) in layers"
-        :key="layer.name"
-        class="parallax-layer"
-        :class="`parallax-layer--${layer.name}`"
-        :style="layerStyles[idx]"
-      >
-        <div class="layer-placeholder" :data-layer="layer.name">
-          {{ layer.label }}
+    <!-- 调试信息 -->
+    <div class="debug-info" v-if="false">
+      Cam: {{ Math.round(camera.x) }}, {{ Math.round(camera.y) }}
+    </div>
+
+    <!-- 视差世界容器 -->
+    <div class="parallax-world">
+      
+      <!-- 层级 1: 远景天空/海洋 (移动系数 0.1) -->
+      <div class="world-layer layer-sky" :style="getLayerStyle(0.1)">
+        <div class="bg-gradient"></div>
+        <img src="@/assets/images/map-layers/浮标.png" class="prop buoy-1" />
+      </div>
+
+      <!-- 层级 2: 中远景岛屿 (移动系数 0.3) -->
+      <div class="world-layer layer-islands" :style="getLayerStyle(0.3)">
+        <img src="@/assets/images/map-layers/小岛主岛.png" class="prop small-island" />
+        <img src="@/assets/images/map-layers/小岛灯塔.png" class="prop lighthouse" />
+      </div>
+
+      <!-- 层级 3: 游戏主平面 (移动系数 1.0 - 基准层) -->
+      <div class="world-layer layer-main" :style="getLayerStyle(1.0)">
+        
+        <!-- 地形拼图 (新素材) -->
+        <img src="@/assets/images/素材/1.png" class="prop land-1" />
+        <img src="@/assets/images/素材/2.png" class="prop land-2" />
+        <img src="@/assets/images/素材/3.png" class="prop land-3" />
+        <img src="@/assets/images/素材/4.png" class="prop land-4" />
+        
+        <!-- 建筑装饰 -->
+        <img src="@/assets/images/map-layers/骰子.png" class="prop building-dice" />
+
+        <!-- 交互标记点 -->
+        <div class="markers-container">
+          <MapLocation
+            v-for="(marker, index) in markers"
+            :key="marker.id"
+            :id="marker.id"
+            :x="marker.x" 
+            :y="marker.y"
+            :icon="marker.icon"
+            :title="marker.title"
+            :type="marker.type"
+            :description="marker.description"
+            :unlocked="marker.unlocked"
+            :offset-x="0"
+            :offset-y="0"
+            :style="{ '--marker-index': index }"
+            class="world-marker"
+            @click="onMarkerClick"
+          />
         </div>
       </div>
 
-      <!-- 地图主内容区域 -->
-      <div class="map-content">
-        <!-- 地图标题 -->
-        <h1 class="map-title">Inkwell Isle</h1>
-
-        <!-- 位置标记：后续可替换为 MapLocation 组件 -->
-        <button
-          v-for="marker in markers"
-          :key="marker.id"
-          class="marker"
-          :class="`marker--${marker.type}`"
-          :style="{ left: marker.x + '%', top: marker.y + '%' }"
-          :aria-label="marker.title"
-          @click="onMarkerClick(marker)"
-          @mouseenter="onMarkerHover(marker, true)"
-          @mouseleave="onMarkerHover(marker, false)"
-        >
-          <span class="marker__icon">{{ marker.icon }}</span>
-          <span class="marker__tooltip">{{ marker.title }}</span>
-        </button>
-
-        <!-- 装饰性路径线条 -->
-        <svg class="map-paths" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path
-            class="path-line"
-            d="M15,25 Q30,40 50,55 T72,28"
-            fill="none"
-            stroke="var(--color-sepia)"
-            stroke-width="0.3"
-            stroke-dasharray="1,1"
-          />
-          <path
-            class="path-line path-line--delayed"
-            d="M50,55 Q40,60 30,65"
-            fill="none"
-            stroke="var(--color-sepia)"
-            stroke-width="0.3"
-            stroke-dasharray="1,1"
-          />
-        </svg>
+      <!-- 层级 4: 前景遮挡 (移动系数 1.4) -->
+      <div class="world-layer layer-foreground" :style="getLayerStyle(1.4)">
+        <img src="@/assets/images/map-layers/树.png" class="prop tree-left" />
+        <img src="@/assets/images/map-layers/树.png" class="prop tree-right" />
+        <img src="@/assets/images/map-layers/树.png" class="prop tree-center" />
       </div>
+
     </div>
 
-    <!-- 底部装饰边框 -->
-    <div class="map-border map-border--top"></div>
-    <div class="map-border map-border--bottom"></div>
+    <!-- UI 提示 -->
+    <div class="interaction-hint" :class="{ 'fade-out': hasInteracted }">
+      <div class="mouse-icon"></div>
+      <span>DRAG TO EXPLORE</span>
+    </div>
   </div>
 </template>
 
 <script setup>
 /**
- * MapView.vue - 地图主页面组件
- * 成员1 核心任务：创建全屏地图容器与多层视差背景
- *
- * 功能：
- * 1. 全屏显示地图，支持多层视差背景
- * 2. 鼠标移动时产生视差效果（移动端禁用）
- * 3. 复古卡通风格（胶片噪点、渐晕、扫描线）
- * 4. 可点击的位置标记，支持悬停动画
- *
- * 素材路径约定：
- * - 地图背景：src/assets/images/map-background.jpg
- * - 视差层：src/assets/images/map-layers/map-bg-far.png, map-bg-mid.png, map-bg-near.png
+ * MapView.vue - 漫游版大地图
+ * 实现了拖拽移动摄像机 + 多层视差滚动的效果
  */
+import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import MapLocation from '@/components/MapLocation.vue'
+import { mapLocations } from '@/data/mapLocations'
 
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import useMapParallax from '../hooks/useMapParallax.js'
+const router = useRouter()
+const markers = ref(mapLocations)
 
-// ==================== 视差层配置 ====================
-const layers = [
-  { name: 'far', src: '/src/assets/images/map-layers/map-bg-far.png', label: '🏔️ 远景层' },
-  { name: 'mid', src: '/src/assets/images/map-layers/map-bg-mid.png', label: '☁️ 中景层' },
-  { name: 'near', src: '/src/assets/images/map-layers/map-bg-near.png', label: '🌿 近景层' }
-]
+// ================= 配置 =================
+// 虚拟世界尺寸 (比屏幕大很多)
+const WORLD_WIDTH = 3000
+const WORLD_HEIGHT = 1800
 
-// ==================== 地图标记配置 ====================
-// 后续可由成员4 的 mapLocations.js 替换
-const markers = ref([
-  { id: 'story', x: 15, y: 25, icon: '📖', title: '故事书', type: 'story' },
-  { id: 'game', x: 50, y: 55, icon: '🎮', title: '开始游戏', type: 'game' },
-  { id: 'boss1', x: 72, y: 28, icon: '💀', title: 'Boss 挑战', type: 'boss' },
-  { id: 'boss2', x: 30, y: 65, icon: '👹', title: '恶魔领地', type: 'boss' },
-  { id: 'boss3', x: 82, y: 60, icon: '🎪', title: '嘉年华', type: 'boss' }
-])
+// ================= 状态 =================
+const camera = reactive({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }) // 摄像机中心点坐标
+const targetCamera = reactive({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 })
+const isDragging = ref(false)
+const hasInteracted = ref(false)
+const lastMousePos = { x: 0, y: 0 }
 
-// ==================== 视差效果 ====================
-const { layerStyles, start, stop } = useMapParallax({
-  layerCount: layers.length,
-  mouseIntensity: 15,
-  scrollIntensity: 0.03
-})
-
-// ==================== 事件处理 ====================
-const activeMarker = ref(null)
-
-function onMarkerClick(marker) {
-  // 占位：成员5 可在此接入路由跳转或成员3 的模态框
-  // eslint-disable-next-line no-console
-  console.log('[MapView] 点击标记:', marker.id, marker.title)
-
-  // 触发自定义事件（供父组件监听）
-  // emit('marker-click', marker)
+// ================= 拖拽逻辑 =================
+function startDrag(e) {
+  // 如果点击的是按钮或按钮内部元素，不触发拖拽
+  if (e.target.closest('.map-location')) {
+    return
+  }
+  isDragging.value = true
+  hasInteracted.value = true
+  const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX
+  const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY
+  lastMousePos.x = clientX
+  lastMousePos.y = clientY
 }
 
-function onMarkerHover(marker, isHovering) {
-  activeMarker.value = isHovering ? marker : null
+function onDrag(e) {
+  if (!isDragging.value) return
+  // e.preventDefault() // 防止触摸滚动页面
+
+  const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX
+  const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY
+
+  const dx = clientX - lastMousePos.x
+  const dy = clientY - lastMousePos.y
+
+  // 移动摄像机 (拖拽背景意味着摄像机向相反方向移动)
+  targetCamera.x -= dx * 1.5 // 1.5倍系数让拖拽更有力
+  targetCamera.y -= dy * 1.5
+
+  // 更新上一次位置
+  lastMousePos.x = clientX
+  lastMousePos.y = clientY
+
+  clampCamera()
 }
 
-// ==================== 生命周期 ====================
+function stopDrag() {
+  isDragging.value = false
+}
+
+// 限制摄像机范围
+function clampCamera() {
+  const viewportW = window.innerWidth
+  const viewportH = window.innerHeight
+  
+  // 简单的边界限制，防止完全看丢地图
+  // 允许一定的留白，但不能无限拖
+  const minX = 0
+  const maxX = WORLD_WIDTH
+  const minY = 0
+  const maxY = WORLD_HEIGHT
+
+  if (targetCamera.x < minX) targetCamera.x = minX
+  if (targetCamera.x > maxX) targetCamera.x = maxX
+  if (targetCamera.y < minY) targetCamera.y = minY
+  if (targetCamera.y > maxY) targetCamera.y = maxY
+}
+
+// ================= 动画循环 =================
+let rafId
+function animate() {
+  // 摄像机平滑跟随 (Lerp)
+  camera.x += (targetCamera.x - camera.x) * 0.1
+  camera.y += (targetCamera.y - camera.y) * 0.1
+
+  rafId = requestAnimationFrame(animate)
+}
+
+// ================= 视差计算 =================
+// 根据层级深度计算偏移量
+// depth = 1.0 跟随摄像机 (主世界)
+// depth < 1.0 移动更慢 (远景)
+// depth > 1.0 移动更快 (近景)
+function getLayerStyle(depth) {
+  const viewportW = window.innerWidth
+  const viewportH = window.innerHeight
+
+  // 计算摄像机主要针对主世界(depth=1)的偏移
+  // 我们希望 camera.x, camera.y 对应屏幕中心
+  // offset = screenCenter - camera * depth
+  
+  // 对于视差层，我们需要一个参考点（世界中心），以免层级错位
+  const worldCenterX = WORLD_WIDTH / 2
+  const worldCenterY = WORLD_HEIGHT / 2
+
+  // 视差公式：
+  // LayerOffset = (WorldCenter - CameraPos) * depth
+  // 这样当 Camera 在 WorldCenter 时，所有层对齐
+  
+  const offsetX = (worldCenterX - camera.x) * depth
+  const offsetY = (worldCenterY - camera.y) * depth
+
+  // 加上初始居中修正，让 WorldCenter 对应 ScreenCenter
+  const screenCenterX = viewportW / 2
+  const screenCenterY = viewportH / 2
+  
+  // 最终 transform
+  const finalX = screenCenterX - worldCenterX + offsetX
+  const finalY = screenCenterY - worldCenterY + offsetY
+
+  return {
+    transform: `translate3d(${finalX}px, ${finalY}px, 0)`
+  }
+}
+
+// ================= 交互回调 =================
+function onMarkerClick(eventData) {
+  // eventData 来自 MapLocation emit，只有 { id, type }
+  // 需要从 markers 中找到完整的 marker 对象
+  const marker = markers.value.find(m => m.id === eventData.id)
+  if (marker && marker.route) {
+    if (marker.routeParams) {
+      router.push({ path: marker.route, query: marker.routeParams })
+    } else {
+      router.push(marker.route)
+    }
+  }
+}
+
+// ================= 生命周期 =================
 onMounted(() => {
-  start()
-  // eslint-disable-next-line no-console
-  console.log('[MapView] 地图组件已挂载，视差效果已启动')
+  // 初始摄像机位置设置为第一个标记点或者中心
+  targetCamera.x = WORLD_WIDTH * 0.5
+  targetCamera.y = WORLD_HEIGHT * 0.5
+  
+  animate()
+  window.addEventListener('resize', clampCamera)
 })
 
 onBeforeUnmount(() => {
-  stop()
+  cancelAnimationFrame(rafId)
+  window.removeEventListener('resize', clampCamera)
 })
 </script>
 
 <style scoped>
-/* ==================== 容器样式 ==================== */
-.map-view {
+.map-view-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #4da6ff; /* 海洋/天空基色 */
+  position: relative;
+  cursor: grab;
+  user-select: none;
+}
+
+.map-view-container:active {
+  cursor: grabbing;
+}
+
+/* 调试信息 */
+.debug-info {
   position: fixed;
-  inset: 0;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  padding: 5px;
+  z-index: 9999;
+  font-family: monospace;
+}
+
+/* 视差容器 */
+.parallax-world {
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  background: var(--color-bg, #1a1410);
-}
-
-.map-container {
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(26, 20, 16, 0.3) 0%,
-      transparent 50%,
-      rgba(26, 20, 16, 0.3) 100%
-    ),
-    var(--color-bg-warm, #2a1f18) url('/src/assets/images/map-background.jpg') center/cover no-repeat;
+  top: 0;
+  left: 0;
+  /* 3D 变换性能优化 */
+  perspective: 1000px;
 }
 
-/* ==================== 复古效果叠加层 ==================== */
-.retro-overlay {
+.world-layer {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-}
-
-/* 胶片噪点效果 */
-.film-grain {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  animation: grain 0.5s steps(10) infinite;
-}
-
-@keyframes grain {
-  0%, 100% { transform: translate(0, 0); }
-  10% { transform: translate(-1%, -1%); }
-  20% { transform: translate(1%, 1%); }
-  30% { transform: translate(-1%, 1%); }
-  40% { transform: translate(1%, -1%); }
-  50% { transform: translate(-1%, 0); }
-  60% { transform: translate(1%, 0); }
-  70% { transform: translate(0, 1%); }
-  80% { transform: translate(0, -1%); }
-  90% { transform: translate(1%, 1%); }
-}
-
-/* 渐晕效果 */
-.vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 0%,
-    transparent 50%,
-    rgba(26, 20, 16, 0.4) 80%,
-    rgba(26, 20, 16, 0.8) 100%
-  );
-}
-
-/* 扫描线效果 */
-.scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
-}
-
-/* ==================== 视差层 ==================== */
-.parallax-layer {
-  position: absolute;
-  inset: -20px; /* 扩展边界防止视差时露出边缘 */
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 3000px; /* 需与 WORLD_WIDTH 一致 */
+  height: 1800px; /* 需与 WORLD_HEIGHT 一致 */
+  transform-origin: center center;
+  pointer-events: none; /* 让鼠标事件透过层级传到底层容器 */
   will-change: transform;
-  transition: transform 0.1s ease-out;
 }
 
-.parallax-layer--far {
-  z-index: 1;
-  opacity: 0.6;
+/* 激活主层的点击事件，否则点不到 marker */
+.layer-main {
+  pointer-events: auto;
 }
 
-.parallax-layer--mid {
-  z-index: 2;
+/* ========== 层级内容布局 ========== */
+
+/* 天空/背景 */
+.bg-gradient {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
   opacity: 0.8;
 }
 
-.parallax-layer--near {
-  z-index: 3;
-  opacity: 0.9;
+.prop {
+  position: absolute;
+  display: block;
+  /* 像素化渲染，保持复古感 */
+  image-rendering: pixelated; 
 }
 
-/* 占位符样式（正式素材到位后可删除） */
-.layer-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: var(--color-sepia, #d4a574);
-  opacity: 0.3;
-  font-family: var(--body-font, 'Gloria Hallelujah', cursive);
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(212, 165, 116, 0.05) 50%,
-    transparent 100%
-  );
+/* 远景物体 */
+.buoy-1 {
+  bottom: 20%;
+  right: 15%;
+  width: 80px;
+  animation: float 4s infinite ease-in-out;
 }
 
-/* ==================== 地图内容区 ==================== */
-.map-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
+/* 中远景物体 */
+.small-island {
+  top: 20%;
+  left: 10%;
+  width: 400px;
+}
+.lighthouse {
+  top: 15%;
+  left: 15%;
+  width: 100px;
+  z-index: 1;
+}
+
+/* 主地形 (使用新素材) */
+.land-1 {
+  top: 30%;
+  left: 2%;
+  width: 750px;
+  z-index: 5;
+}
+.land-2 {
+  top: 35%;
+  left: 25%;
+  width: 700px;
+  z-index: 4; /*稍微靠后一点，制造层叠感 */
+}
+.land-3 {
+  top: 28%;
+  left: 48%;
+  width: 750px;
+  z-index: 5;
+}
+.land-4 {
+  top: 32%;
+  left: 72%;
+  width: 800px;
+  z-index: 4;
+}
+
+/* 建筑 (相对位置微调适配新地形) */
+.building-shop {
+  top: 35%;
+  left: 15%; /* 移到左1岛 */
+  width: 150px;
+  z-index: 10;
+}
+.building-dice {
+  top: 25%;
+  left: 80%; /* 移到右2岛 */
+  width: 180px;
   z-index: 10;
 }
 
-/* 地图标题 */
-.map-title {
+/* 标记容器 (填满主层) */
+.markers-container {
   position: absolute;
-  top: 5%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--header-font, 'Rye', serif);
-  font-size: clamp(24px, 5vw, 48px);
-  color: var(--color-cream, #f5e6c8);
-  text-shadow:
-    3px 3px 0 var(--color-rust, #8b4513),
-    6px 6px 0 rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-  animation: titleFloat 4s ease-in-out infinite;
-}
-
-@keyframes titleFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
-}
-
-/* ==================== 位置标记 ==================== */
-.marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(
-    circle,
-    var(--color-cream, #f5e6c8) 0%,
-    var(--color-sepia, #d4a574) 100%
-  );
-  border: 3px solid var(--color-rust, #8b4513);
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 2px rgba(245, 230, 200, 0.2),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3);
-  -webkit-tap-highlight-color: transparent;
-  z-index: 20;
-}
-
-.marker:hover {
-  transform: translate(-50%, -50%) scale(1.25) rotate(5deg);
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.4),
-    0 0 20px var(--color-gold, #c9a227),
-    inset 0 2px 4px rgba(255, 255, 255, 0.4);
-  border-color: var(--color-gold, #c9a227);
-}
-
-.marker:active {
-  transform: translate(-50%, -50%) scale(1.1);
-}
-
-.marker__icon {
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
+  z-index: 100;
+  pointer-events: none; /* 容器本身不拦截事件 */
 }
 
-/* 标记类型特定样式 */
-.marker--story {
-  animation: markerPulse 3s ease-in-out infinite;
+/* 确保 MapLocation 按钮可点击 */
+.markers-container :deep(.map-location) {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
-.marker--game {
-  animation: markerPulse 3s ease-in-out infinite 0.5s;
-  background: radial-gradient(
-    circle,
-    #ffeaa7 0%,
-    var(--color-gold, #c9a227) 100%
-  );
+/* 专门针对 MapLocation 在大地图模式下的样式调整 */
+/* 注意：MapLocation 组件通过 props 接收 x/y (百分比) */
+/* 在这里我们需要确保 MapLocation 绝对定位是相对于 .layer-main (3000x2000) */
+/* 现有的 MapLocation 内部已经是 position: absolute 并使用 left: x%, top: y% */
+/* 所以只要父容器尺寸是对的，百分比就能正常工作 */
+
+/* 前景 */
+.tree-left {
+  bottom: 5%;
+  left: 5%;
+  width: 400px;
+  filter: blur(2px);
+}
+.tree-center {
+  bottom: -10%;
+  left: 40%;
+  width: 500px;
+  filter: blur(1px);
+}
+.tree-right {
+  bottom: 10%;
+  right: 2%;
+  width: 450px;
+  filter: blur(2px);
 }
 
-.marker--boss {
-  animation: markerPulse 3s ease-in-out infinite 1s;
-  background: radial-gradient(
-    circle,
-    #fab1a0 0%,
-    var(--color-wine, #722f37) 100%
-  );
-  border-color: var(--color-red, #c41e3a);
-}
-
-@keyframes markerPulse {
-  0%, 100% { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(201, 162, 39, 0.4); }
-  50% { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 8px rgba(201, 162, 39, 0); }
-}
-
-/* 标记提示文字 */
-.marker__tooltip {
+/* 交互提示 */
+.interaction-hint {
   position: absolute;
-  bottom: 110%;
+  bottom: 30px;
   left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background: var(--color-bg, #1a1410);
-  color: var(--color-cream, #f5e6c8);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-family: var(--body-font, 'Gloria Hallelujah', cursive);
-  font-size: 14px;
-  white-space: nowrap;
-  opacity: 0;
+  transform: translateX(-50%);
+  color: white;
+  font-family: 'CupheadMemphis', sans-serif;
+  text-shadow: 2px 2px 0 #000;
+  opacity: 0.8;
+  transition: opacity 1s;
   pointer-events: none;
-  transition: all 0.2s ease;
-  border: 2px solid var(--color-sepia, #d4a574);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
-
-.marker__tooltip::after {
+.interaction-hint.fade-out {
+  opacity: 0;
+}
+.mouse-icon {
+  width: 30px;
+  height: 48px;
+  border: 2px solid white;
+  border-radius: 15px;
+  position: relative;
+}
+.mouse-icon::after {
   content: '';
   position: absolute;
-  top: 100%;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--color-sepia, #d4a574);
+  width: 4px;
+  height: 8px;
+  background: white;
+  border-radius: 2px;
+  animation: scrollMouse 1.5s infinite;
 }
 
-.marker:hover .marker__tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+@keyframes scrollMouse {
+  0% { top: 8px; opacity: 1; }
+  100% { top: 20px; opacity: 0; }
 }
 
-/* ==================== 装饰路径 ==================== */
-.map-paths {
-  position: absolute;
-  inset: 0;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* 复古滤镜复用 (确保有高 z-index) */
+.retro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 5;
-}
-
-.path-line {
-  stroke-dashoffset: 100;
-  animation: drawPath 3s ease forwards;
-}
-
-.path-line--delayed {
-  animation-delay: 1.5s;
-}
-
-@keyframes drawPath {
-  to { stroke-dashoffset: 0; }
-}
-
-/* ==================== 边框装饰 ==================== */
-.map-border {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--color-rust, #8b4513) 0px,
-    var(--color-rust, #8b4513) 20px,
-    var(--color-sepia, #d4a574) 20px,
-    var(--color-sepia, #d4a574) 40px
-  );
-  z-index: 50;
-}
-
-.map-border--top {
-  top: 0;
-}
-
-.map-border--bottom {
-  bottom: 0;
-}
-
-/* ==================== 响应式适配 ==================== */
-@media (max-width: 768px) {
-  .marker {
-    width: 44px;
-    height: 44px;
-  }
-
-  .marker__icon {
-    font-size: 18px;
-  }
-
-  .marker__tooltip {
-    font-size: 12px;
-    padding: 4px 8px;
-  }
-
-  .map-title {
-    font-size: clamp(18px, 4vw, 32px);
-  }
-}
-
-@media (max-width: 480px) {
-  .marker {
-    width: 36px;
-    height: 36px;
-  }
-
-  .marker__icon {
-    font-size: 14px;
-  }
-
-  .layer-placeholder {
-    font-size: 16px;
-  }
-}
-
-/* ==================== 减少动画（无障碍） ==================== */
-@media (prefers-reduced-motion: reduce) {
-  .film-grain,
-  .marker,
-  .marker--story,
-  .marker--game,
-  .marker--boss,
-  .map-title,
-  .path-line {
-    animation: none;
-  }
-
-  .parallax-layer {
-    transition: none;
-  }
+  z-index: 999;
 }
 </style>
+
+
+
+
+
+
+
+
+
+

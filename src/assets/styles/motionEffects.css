@@ -1,0 +1,473 @@
+/**
+ * motionEffects.css - 从动效.md 转换的核心动效库
+ * 基于 React 组件概念，使用纯 CSS 实现
+ */
+
+/* ========== 1. Antigravity 反重力粒子效果 ========== */
+/* 模拟粒子漂浮的微妙运动 */
+
+.antigravity-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.antigravity-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #a96800;
+  border-radius: 50%;
+  animation: antigravityFloat 8s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.antigravity-particle:nth-child(odd) {
+  animation-duration: 10s;
+  animation-delay: -2s;
+}
+
+.antigravity-particle:nth-child(3n) {
+  animation-duration: 12s;
+  animation-delay: -4s;
+  width: 3px;
+  height: 3px;
+}
+
+.antigravity-particle:nth-child(5n) {
+  animation-duration: 7s;
+  animation-delay: -1s;
+  width: 5px;
+  height: 5px;
+}
+
+@keyframes antigravityFloat {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(10px, -20px) rotate(90deg);
+  }
+  50% {
+    transform: translate(-5px, -35px) rotate(180deg);
+  }
+  75% {
+    transform: translate(15px, -15px) rotate(270deg);
+  }
+}
+
+/* ========== 2. ASCII Art Text 波浪文字效果 ========== */
+/* 模拟 ASCIIText 的波浪动效 */
+
+.ascii-wave-text {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+.ascii-wave-text span {
+  display: inline-block;
+  animation: asciiWave 2s ease-in-out infinite;
+  animation-delay: calc(var(--char-index, 0) * 0.1s);
+}
+
+@keyframes asciiWave {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    transform: translateY(-8px) scaleY(1.05);
+  }
+  50% {
+    transform: translateY(0) scaleY(0.95);
+  }
+  75% {
+    transform: translateY(4px) scaleY(1.02);
+  }
+}
+
+/* 色彩位移效果（模拟 RGB 分离） */
+.ascii-chromatic {
+  position: relative;
+}
+
+.ascii-chromatic::before,
+.ascii-chromatic::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ascii-chromatic::before {
+  color: #ff6188;
+  animation: chromaticShift 0.5s ease-in-out infinite alternate;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+.ascii-chromatic::after {
+  color: #78dce8;
+  animation: chromaticShift 0.5s ease-in-out infinite alternate-reverse;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+
+@keyframes chromaticShift {
+  0% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(2px);
+  }
+}
+
+/* ========== 3. BounceCards 弹性卡片效果 ========== */
+/* GSAP elastic.out 缓动的 CSS 近似 */
+
+.bounce-cards-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.bounce-card {
+  opacity: 0;
+  transform: scale(0);
+  animation: bounceCardIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* 交错延迟 */
+.bounce-card:nth-child(1) { animation-delay: 0.1s; }
+.bounce-card:nth-child(2) { animation-delay: 0.18s; }
+.bounce-card:nth-child(3) { animation-delay: 0.26s; }
+.bounce-card:nth-child(4) { animation-delay: 0.34s; }
+.bounce-card:nth-child(5) { animation-delay: 0.42s; }
+
+@keyframes bounceCardIn {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-5deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(2deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(-1deg);
+  }
+  85% {
+    transform: scale(1.03) rotate(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 卡片悬停展开效果 */
+.bounce-cards-container:hover .bounce-card {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bounce-cards-container:hover .bounce-card:nth-child(1) {
+  transform: translateX(-120px) rotate(10deg);
+}
+
+.bounce-cards-container:hover .bounce-card:nth-child(2) {
+  transform: translateX(-60px) rotate(5deg);
+}
+
+.bounce-cards-container:hover .bounce-card:nth-child(3) {
+  transform: translateX(0) rotate(-3deg) scale(1.1);
+  z-index: 10;
+}
+
+.bounce-cards-container:hover .bounce-card:nth-child(4) {
+  transform: translateX(60px) rotate(-5deg);
+}
+
+.bounce-cards-container:hover .bounce-card:nth-child(5) {
+  transform: translateX(120px) rotate(-10deg);
+}
+
+/* ========== 4. CardNav 卡片导航效果 ========== */
+/* 汉堡菜单动画 */
+
+.hamburger-menu {
+  width: 30px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 3px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-origin: center;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.hamburger-menu.open .hamburger-line:last-child {
+  transform: translateY(-10px) rotate(-45deg);
+}
+
+/* 导航卡片滑入 */
+.nav-card {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.nav-card:nth-child(1) { transition-delay: 0.1s; }
+.nav-card:nth-child(2) { transition-delay: 0.18s; }
+.nav-card:nth-child(3) { transition-delay: 0.26s; }
+
+/* ========== 5. GlassSurface 玻璃磨砂效果 ========== */
+/* 基于 backdrop-filter 的毛玻璃效果 */
+
+.glass-surface {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px) saturate(1.8);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+/* 玻璃高光效果 */
+.glass-surface::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 60%
+  );
+  animation: glassShine 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glassShine {
+  0%, 100% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  50% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* 色差位移效果 */
+.glass-chromatic {
+  position: relative;
+}
+
+.glass-chromatic > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-chromatic::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: inherit;
+  filter: blur(8px);
+  opacity: 0.5;
+  z-index: 0;
+  animation: chromaticPulse 3s ease-in-out infinite;
+}
+
+@keyframes chromaticPulse {
+  0%, 100% {
+    filter: blur(8px) hue-rotate(0deg);
+  }
+  50% {
+    filter: blur(12px) hue-rotate(10deg);
+  }
+}
+
+/* ========== 6. 复古电影胶片效果 ========== */
+/* 增强的胶片颗粒和闪烁 */
+
+.film-effect {
+  position: relative;
+}
+
+.film-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: filmGrain 0.15s steps(5) infinite;
+}
+
+@keyframes filmGrain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-2%, 2%); }
+  40% { transform: translate(2%, -2%); }
+  60% { transform: translate(-1%, -1%); }
+  80% { transform: translate(1%, 1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* 老电影闪烁 */
+.film-flicker {
+  animation: filmFlicker 4s linear infinite;
+}
+
+@keyframes filmFlicker {
+  0%, 100% { opacity: 1; }
+  4% { opacity: 0.95; }
+  8% { opacity: 1; }
+  12% { opacity: 0.97; }
+  16% { opacity: 1; }
+  48% { opacity: 0.98; }
+  52% { opacity: 1; }
+  76% { opacity: 0.96; }
+  80% { opacity: 1; }
+}
+
+/* ========== 7. 墨水扩散效果 ========== */
+
+.ink-reveal {
+  animation: inkReveal 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes inkReveal {
+  0% {
+    clip-path: circle(0% at var(--ink-x, 50%) var(--ink-y, 50%));
+    opacity: 0;
+  }
+  100% {
+    clip-path: circle(150% at var(--ink-x, 50%) var(--ink-y, 50%));
+    opacity: 1;
+  }
+}
+
+/* ========== 8. 弹簧物理动画 ========== */
+/* 模拟真实弹簧效果 */
+
+.spring-enter {
+  animation: springEnter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes springEnter {
+  0% {
+    transform: scale(0) translateY(50px);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.15) translateY(-10px);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(0.9) translateY(5px);
+  }
+  80% {
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========== 9. 视差深度效果 ========== */
+/* 3D 深度层叠 */
+
+.parallax-depth {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.parallax-depth-layer {
+  transform: translateZ(var(--depth, 0px));
+  will-change: transform;
+}
+
+.parallax-depth-layer--back {
+  --depth: -100px;
+  transform: translateZ(-100px) scale(1.2);
+}
+
+.parallax-depth-layer--mid {
+  --depth: -50px;
+  transform: translateZ(-50px) scale(1.1);
+}
+
+.parallax-depth-layer--front {
+  --depth: 0px;
+}
+
+/* ========== 10. 橡皮筋按钮效果 ========== */
+
+.rubber-button {
+  transition: transform 0.1s ease;
+}
+
+.rubber-button:hover {
+  animation: rubberStretch 0.4s ease-out;
+}
+
+.rubber-button:active {
+  transform: scale(0.95);
+}
+
+@keyframes rubberStretch {
+  0% { transform: scale(1); }
+  30% { transform: scaleX(1.2) scaleY(0.8); }
+  40% { transform: scaleX(0.9) scaleY(1.1); }
+  50% { transform: scaleX(1.05) scaleY(0.95); }
+  65% { transform: scaleX(0.98) scaleY(1.02); }
+  75% { transform: scaleX(1.01) scaleY(0.99); }
+  100% { transform: scale(1); }
+}
+
+/* ========== 无障碍：减少动画 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -143,3 +143,105 @@ p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ========== 可访问性 (a11y) ========== */
+
+/* 焦点可见样式 */
+:focus-visible {
+  outline: 3px solid var(--color-gold, #c9a227);
+  outline-offset: 2px;
+}
+
+/* 跳过导航链接 */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-bg, #1a1410);
+  color: var(--color-cream, #f5e6c8);
+  padding: 12px 24px;
+  border: 2px solid var(--color-gold, #c9a227);
+  border-radius: 8px;
+  font-family: var(--body-font);
+  font-size: 1rem;
+  z-index: 100000;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 10px;
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  :root {
+    --color-cream: #ffffff;
+    --color-bg: #000000;
+    --color-sepia: #ffffff;
+  }
+}
+
+/* ========== 性能优化 ========== */
+
+/* GPU 加速层 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* 懒加载图片占位 */
+img[data-src] {
+  background: linear-gradient(135deg, #2a1f18 0%, #1a1410 100%);
+  min-height: 100px;
+}
+
+img.loaded {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========== 触摸设备优化 ========== */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大触摸目标 */
+  button,
+  a,
+  [role="button"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* 禁用悬停效果 */
+  .hover-only {
+    display: none;
+  }
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}

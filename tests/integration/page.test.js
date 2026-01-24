@@ -8,7 +8,7 @@ describe('Page Integration Tests', () => {
           <div class="screen-bezel">
             <div class="screen-content" id="screen-area">
               <div class="scanlines"></div>
-              <iframe id="game-frame" src="../../webwebweb/index.html"></iframe>
+              <iframe id="game-frame" src="/game/index.html" title="Cuphead Game"></iframe>
             </div>
           </div>
           <div class="controls-panel">
@@ -29,7 +29,7 @@ describe('Page Integration Tests', () => {
       
       expect(screenArea).toBeTruthy();
       expect(iframe).toBeTruthy();
-      expect(iframe.src).toContain('game/index.html');
+      expect(iframe.getAttribute('src')).toBe('/game/index.html');
     });
 
     it('should have scanlines effect', () => {
@@ -39,6 +39,11 @@ describe('Page Integration Tests', () => {
     it('should have control buttons', () => {
       expect(document.getElementById('fullscreen-btn')).toBeTruthy();
       expect(document.getElementById('mute-btn')).toBeTruthy();
+    });
+
+    it('should have accessible iframe with title', () => {
+      const iframe = document.getElementById('game-frame');
+      expect(iframe.getAttribute('title')).toBe('Cuphead Game');
     });
   });
 

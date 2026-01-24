@@ -1,23 +1,13 @@
-# 🎮 Cuphead Web Project
+#  Cuphead Web Project
 
 > 1930s 复古卡通风格的 Cuphead 致敬网页项目 - Vue 3 版本
 
 ![Vue](https://img.shields.io/badge/Vue-3.4-4FC08D?logo=vue.js)
 ![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite)
 ![License](https://img.shields.io/badge/License-MIT-blue)
-
-## ✨ 特性
-
-- 🎨 **1930s 复古视觉风格** - 胶片颗粒、扫描线、暗角特效
-- 🎮 **嵌入式 Unity WebGL 游戏** - 完整的可玩游戏体验
-- 📖 **交互式故事书** - 打字机效果、翻页动画
-- 💀 **Boss 画廊** - 多阶段战斗详情展示
-- 🃏 **扑克牌导航** - 创意复古 UI 设计
-- 📱 **响应式设计** - 适配桌面和移动端
-
 ---
 
-## 🚀 快速开始
+## 快速开始
 
 ### 环境要求
 
@@ -48,7 +38,7 @@ npm run preview
 
 ---
 
-## 📁 项目结构
+## 项目结构
 
 ```
 Cuphead-web-project/
@@ -56,57 +46,82 @@ Cuphead-web-project/
 ├── vite.config.js          # Vite 构建配置
 ├── package.json            # 依赖配置
 │
-├── config/                 # 📦 配置文件
+├── config/                 # ⚙️ 配置文件
 │   ├── eslint.config.js    # ESLint 代码规范
-│   ├── vitest.config.js    # Vitest 测试配置
-│   └── .prettierrc         # Prettier 格式化配置
+│   └── vitest.config.js    # Vitest 测试配置
 │
-├── src/                    # 📂 源代码
+├── docs/                   #  文档
+│   └── TASK_ASSIGNMENT.md  # 任务分配说明
+│
+├── src/                    #  源代码
 │   ├── main.js             # Vue 入口
 │   ├── App.vue             # 根组件
 │   │
-│   ├── router/             # 🔗 路由配置
+│   ├── router/             # 路由配置
 │   │   └── index.js
 │   │
-│   ├── views/              # 📄 页面组件
+│   ├── views/              #  页面组件
 │   │   ├── Home.vue        # 首页（卡片导航）
+│   │   ├── MapView.vue     # 地图页（交互式岛屿地图）
 │   │   ├── Story.vue       # 故事页（交互式故事书）
 │   │   ├── BossGallery.vue # Boss 画廊（阶段展示）
 │   │   └── GameContainer.vue # 游戏页（Unity 嵌入）
 │   │
-│   ├── components/         # 🧩 公共组件
-│   │   ├── RetroOverlay.vue   # 复古特效层
-│   │   ├── Navigation.vue     # 顶部导航
+│   ├── components/         # 公共组件
+│   │   ├── AudioControl.vue   # 音频控制器
 │   │   ├── BackButton.vue     # 返回按钮
+│   │   ├── BaseModal.vue      # 基础弹窗组件
+│   │   ├── BossModal.vue      # Boss 详情弹窗
 │   │   ├── KnobButton.vue     # 复古旋钮按钮
+│   │   ├── LoadingSpinner.vue # 加载动画
+│   │   ├── MapLocation.vue    # 地图位置标记
+│   │   ├── Navigation.vue     # 顶部导航
 │   │   ├── PhaseSelector.vue  # 阶段选择器
 │   │   ├── PlayingCard.vue    # 扑克牌卡片
-│   │   └── LoadingSpinner.vue # 加载动画
+│   │   ├── RetroOverlay.vue   # 复古特效层
+│   │   └── StoryModal.vue     # 故事弹窗
 │   │
-│   ├── hooks/              # 🪝 逻辑复用 (Composables)
+│   ├── data/               #  数据配置
+│   │   ├── bossData.js        # Boss 数据
+│   │   ├── mapLocations.js    # 地图位置数据
+│   │   └── storyData.js       # 故事数据
+│   │
+│   ├── hooks/              #  逻辑复用 (Composables)
+│   │   ├── useAnimations.js   # 滚动/视差动画
+│   │   ├── useAudio.js        # 音频控制逻辑
 │   │   ├── useBossGallery.js  # Boss 管理逻辑
-│   │   ├── useStory.js        # 故事 + 打字机逻辑
 │   │   ├── useGameBridge.js   # Unity 通信桥接
-│   │   └── useAnimations.js   # 滚动/视差动画
+│   │   ├── useMapParallax.js  # 地图视差效果
+│   │   └── useStory.js        # 故事 + 打字机逻辑
 │   │
-│   ├── utils/              # 🔧 工具函数
-│   │   ├── retroEffects.js    # 复古特效工具
-│   │   ├── audioManager.js    # 音频管理
-│   │   └── constants.js       # 全局常量
+│   ├── utils/              #  工具函数
+│   │   ├── audioManager.js    # 音频管理器
+│   │   ├── constants.js       # 全局常量
+│   │   ├── performance.js     # 性能优化工具
+│   │   └── retroEffects.js    # 复古特效工具
 │   │
-│   └── assets/             # 🎨 静态资源
+│   └── assets/             #  静态资源
 │       ├── images/         # 图片素材
+│       │   ├── map-layers/    # 地图图层
+│       │   ├── markers/       # 地图标记图标
+│       │   ├── boss/          # Boss 图片
+│       │   └── story/         # 故事图片
 │       └── styles/         # 全局样式
 │           ├── variables.css  # CSS 变量
 │           ├── global.css     # 基础重置
 │           ├── effects.css    # 特效样式
-│           └── animations.css # 动画库
+│           ├── animations.css # 动画库
+│           └── motionEffects.css # 动效样式
 │
-├── tests/                  # 🧪 测试文件
+├── tests/                  #  测试文件
 │   ├── unit/               # 单元测试
+│   │   ├── composables.test.js
+│   │   ├── game.test.js
+│   │   └── navigation.test.js
 │   └── integration/        # 集成测试
+│       └── page.test.js
 │
-└── game/                   # 🎮 Unity WebGL 游戏
+└── game/                   # Unity WebGL 游戏
     ├── index.html          # Unity 入口
     ├── Build/              # 游戏构建文件
     └── TemplateData/       # 模板资源
@@ -114,7 +129,7 @@ Cuphead-web-project/
 
 ---
 
-## 🛠️ 可用命令
+## 📋 可用命令
 
 | 命令 | 说明 |
 |------|------|
@@ -127,18 +142,19 @@ Cuphead-web-project/
 
 ---
 
-## 🔗 页面路由
+##  页面路由
 
 | 路径 | 页面 | 说明 |
 |------|------|------|
 | `/` | Home | 首页，扑克牌导航 |
+| `/map` | MapView | 交互式岛屿地图 |
 | `/story` | Story | 交互式故事书 |
 | `/boss` | BossGallery | Boss 画廊，多阶段展示 |
 | `/game` | GameContainer | Unity 游戏容器 |
 
 ---
 
-## 🎨 技术栈
+##  技术栈
 
 | 类别 | 技术 |
 |------|------|
@@ -152,7 +168,15 @@ Cuphead-web-project/
 
 ---
 
-## ⚠️ 注意事项
+##  页面预览
+
+| 首页 | 地图 | Boss画廊 |
+|:---:|:---:|:---:|
+| 扑克牌风格导航 | 手绘岛屿地图 | 阶段式Boss展示 |
+
+---
+
+##  注意事项
 
 1. **Unity 游戏加载**  
    由于浏览器安全限制，Unity WebGL 需要通过 HTTP 服务器访问，不能直接用 `file://` 协议打开。
@@ -165,10 +189,18 @@ Cuphead-web-project/
 
 ---
 
-## 📄 License
+## License
 
-本项目仅供学习交流，禁止商用。
+本项目仅供学习交流，禁止商用。Cuphead 是 Studio MDHR 的注册商标。
 
 ---
 
-**小组前端作业**
+## 团队
+
+**小组前端作业** - 2026
+
+---
+
+<p align="center">
+  <i>Don't Deal With The Devil! 🎲</i>
+</p>

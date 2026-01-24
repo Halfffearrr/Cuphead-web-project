@@ -132,6 +132,24 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   min-height: 500px;
+  /* 故事书入场动画 */
+  animation: bookOpen 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center bottom;
+}
+
+@keyframes bookOpen {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-30deg) scale(0.8) translateY(50px);
+  }
+  50% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(5deg) scale(1.02) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0) scale(1) translateY(0);
+  }
 }
 
 /* 书脊 */
@@ -217,6 +235,18 @@ onUnmounted(() => {
 
 .image-frame.fade-in {
   opacity: 1;
+  animation: imageReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes imageReveal {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    transform: rotate(-2deg) scale(0.9);
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+    transform: rotate(-2deg) scale(1);
+  }
 }
 
 .image-frame img {
@@ -259,8 +289,16 @@ onUnmounted(() => {
 }
 
 .nav-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
+  animation: btnRubber 0.35s ease-out;
   box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+}
+
+@keyframes btnRubber {
+  0% { transform: scale(1); }
+  30% { transform: scaleX(1.15) scaleY(0.85); }
+  50% { transform: scaleX(0.92) scaleY(1.08); }
+  70% { transform: scaleX(1.03) scaleY(0.97); }
+  100% { transform: translateY(-2px) scale(1); }
 }
 
 .nav-btn:disabled {

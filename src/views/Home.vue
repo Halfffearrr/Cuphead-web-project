@@ -1,18 +1,10 @@
 <script setup>
 /**
  * Home.vue - 首页
- * 主入口页面，包含导航卡片
+ * 主入口页面，三部分结构：Hero + 地图导航 + 特色介绍
  */
-import { onMounted } from 'vue';
 import Navigation from '@/components/Navigation.vue';
-import PlayingCard from '@/components/PlayingCard.vue';
-
-// 导航卡片数据
-const navCards = [
-  { to: '/story', title: 'Story', icon: '📖', suit: 'heart' },
-  { to: '/boss', title: 'Bosses', icon: '💀', suit: 'club' },
-  { to: '/game', title: 'Play', icon: '🎮', suit: 'diamond' }
-];
+import MapView from '@/views/MapView.vue';
 </script>
 
 <template>
@@ -20,7 +12,7 @@ const navCards = [
     <!-- 顶部导航 -->
     <Navigation />
     
-    <!-- Hero Section -->
+    <!-- 第一部分：Hero Section -->
     <section class="hero-section full-section">
       <div class="hero-content">
         <h1 class="hero-title">
@@ -35,44 +27,37 @@ const navCards = [
       </div>
     </section>
     
-    <!-- 卡片导航区域 -->
-    <section class="cards-section full-section">
-      <div class="gambling-table">
-        <h2 class="table-title">Choose Your Path</h2>
-        
-        <div class="cards-container">
-          <PlayingCard
-            v-for="card in navCards"
-            :key="card.to"
-            :to="card.to"
-            :title="card.title"
-            :icon="card.icon"
-            :suit="card.suit"
-          />
-        </div>
-      </div>
+    <!-- 第二部分：地图导航区域（替换原来的扑克牌） -->
+    <section class="map-section full-section">
+      <MapView />
     </section>
     
-    <!-- 特色介绍区域 -->
+    <!-- 第三部分：特色介绍区域 -->
     <section class="features-section full-section">
       <div class="features-content">
         <h2 class="section-title">Features</h2>
         
         <div class="features-grid">
-          <div class="feature-item">
-            <span class="feature-icon">🎨</span>
+          <div class="feature-item" style="--feature-index: 0">
+            <div class="feature-icon-box">
+              <div class="icon-pencil"></div>
+            </div>
             <h3>1930s Art Style</h3>
             <p>Authentic hand-drawn animations inspired by classic cartoons.</p>
           </div>
           
-          <div class="feature-item">
-            <span class="feature-icon">🎵</span>
+          <div class="feature-item" style="--feature-index: 1">
+            <div class="feature-icon-box">
+              <div class="icon-music"></div>
+            </div>
             <h3>Jazz Soundtrack</h3>
             <p>Original score featuring live jazz recordings.</p>
           </div>
           
-          <div class="feature-item">
-            <span class="feature-icon">👾</span>
+          <div class="feature-item" style="--feature-index: 2">
+            <div class="feature-icon-box">
+              <div class="icon-skull"></div>
+            </div>
             <h3>Epic Boss Battles</h3>
             <p>Challenging fights against unique and memorable bosses.</p>
           </div>
@@ -148,40 +133,11 @@ const navCards = [
   }
 }
 
-/* Cards Section */
-.cards-section {
+/* Map Section - 地图区域 */
+.map-section {
+  position: relative;
   padding: 0;
-}
-
-.gambling-table {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: #2e4d34;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.3) 80%);
-  padding: 4rem 2rem;
-  border-top: 2px dashed rgba(255,255,255,0.2);
-  border-bottom: 2px dashed rgba(255,255,255,0.2);
-}
-
-.table-title {
-  color: #fff;
-  font-family: 'Rye', serif;
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  text-shadow: 3px 3px 0 #1a1a1a, 0 0 10px rgba(0,0,0,0.5);
-  transform: rotate(-2deg);
-}
-
-.cards-container {
-  display: flex;
-  gap: 3rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  perspective: 1000px;
+  overflow: hidden;
 }
 
 /* Features Section */
@@ -216,17 +172,80 @@ const navCards = [
   padding: 40px 30px;
   text-align: center;
   transition: transform 0.3s, border-color 0.3s;
+  /* 弹簧入场动画 */
+  animation: featureSpringIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation-delay: calc(var(--feature-index, 0) * 0.15s);
+  opacity: 0;
+}
+
+@keyframes featureSpringIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(60px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-15px);
+  }
+  70% {
+    transform: scale(0.95) translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .feature-item:hover {
-  transform: translateY(-10px);
+  /* 
+     Critical Fix: 
+     覆盖动画时必须显式保持 opacity: 1，否则因为原动画被移除，
+     opacity 会回退到 CSS 规则中定义的 0。
+  */
+  opacity: 1;
+  animation: featureRubber 0.6s ease-out; /* 稍微加长动画时间 */
   border-color: #c9a227;
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
 }
 
-.feature-icon {
-  font-size: 3rem;
-  display: block;
+@keyframes featureRubber {
+  0% { transform: scale(1); }
+  30% { transform: scaleX(1.15) scaleY(0.85); } /* 更夸张的挤压 */
+  40% { transform: scaleX(0.85) scaleY(1.15); } /* 回弹 */
+  50% { transform: scaleX(1.05) scaleY(0.95); }
+  65% { transform: scaleX(0.98) scaleY(1.02); }
+  100% { transform: translateY(-5px) scale(1); }
+}
+
+/* 图标替代样式 */
+.feature-icon-box {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 20px;
+}
+
+.icon-pencil, .icon-music, .icon-skull {
+  width: 40px;
+  height: 40px;
+  background-color: #c9a227;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* 使用 CSS 绘制简单的形状代替 Emoji，或者使用 unicode 字符 */
+.icon-pencil::before { content: '✎'; font-size: 40px; color: #c9a227; display: block; line-height: 40px; }
+.icon-music::before { content: '♫'; font-size: 40px; color: #c9a227; display: block; line-height: 40px; }
+.icon-skull::before { content: '☠'; font-size: 40px; color: #c9a227; display: block; line-height: 40px; }
+
+/* 覆盖上面的 ::before 重置 background */
+.icon-pencil, .icon-music, .icon-skull {
+  background: transparent;
 }
 
 .feature-item h3 {
@@ -266,14 +285,6 @@ const navCards = [
 
 /* 响应式 */
 @media (max-width: 768px) {
-  .cards-container {
-    gap: 1.5rem;
-  }
-  
-  .table-title {
-    font-size: 1.8rem;
-  }
-  
   .hero-section {
     padding: 80px 20px;
   }

@@ -32,6 +32,9 @@ export default function useMapParallax(options = {}) {
     scrollIntensity = 0.03
   } = options
 
+  // 鼠标偏移量（用于外部计算各元素视差）
+  const mouseOffset = ref({ x: 0, y: 0 })
+
   // 每一层的 style 对象（响应式）
   const layerStyles = Array.from({ length: layerCount }, () =>
     reactive({ transform: 'translate3d(0, 0, 0)' })
@@ -96,6 +99,12 @@ export default function useMapParallax(options = {}) {
     // 归一化鼠标位置到 [-1, 1]
     const x = (e.clientX / window.innerWidth - 0.5) * 2
     const y = (e.clientY / window.innerHeight - 0.5) * 2
+
+    // 更新全局鼠标偏移（用于单个元素视差）
+    mouseOffset.value = {
+      x: x * mouseIntensity,
+      y: y * mouseIntensity * 0.6
+    }
 
     offsets.forEach((offset, idx) => {
       const depth = getDepth(idx)
@@ -190,6 +199,8 @@ export default function useMapParallax(options = {}) {
   return {
     /** 每一层的 style 对象数组，用于绑定到 :style */
     layerStyles,
+    /** 鼠标偏移量，用于计算各元素视差 */
+    mouseOffset,
     /** 启动视差效果 */
     start,
     /** 停止视差效果 */
